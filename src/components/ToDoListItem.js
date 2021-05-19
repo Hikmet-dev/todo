@@ -1,10 +1,10 @@
 import React from 'react';
-import { ListItemText , ListItem, ListItemSecondaryAction, IconButton, Icon, Checkbox} from '@material-ui/core';
+import { ListItemText , ListItem, ListItemSecondaryAction, IconButton, Icon, Checkbox } from '@material-ui/core';
 
 export default function ToDoListItem(props) {
  return(
-    <ListItem key={props.key}>
-        <Checkbox color="primary" checked={props.done} id={props.key}/>
+    <ListItem key={props.id}>
+        <Checkbox color="primary"  onChange={props.onCheck} checked={props.done} value={props.id} />
         <ListItemText  primary={props.task} />
         <ListItemText  primary={props.date} />
         <ListItemSecondaryAction>

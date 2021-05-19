@@ -18,11 +18,17 @@ function App() {
 
   const createNeToDo = (e) => {
     if(e.key === "Enter") {
-      setToDoList(prev => [...prev, {id: Date.now(), task: e.target.value, date: new Date(Date.now()).toLocaleString(), done: true } ]);
+      setToDoList(prev => [...prev, {id: Date.now(),  task: e.target.value, date: new Date(Date.now()).toLocaleString(), done: false } ]);
       setNewToDo('')
-      console.log(toDoList);
     };
   };
+
+  const changeDoneStatus = (e) => {
+      const taskId = toDoList.findIndex(item => item.id == e.target.value);
+      toDoList[taskId].done 
+      ? toDoList[taskId].done = !toDoList[taskId].done 
+      : toDoList[taskId].done = !toDoList[taskId].done;
+    };
 
 
 
@@ -38,7 +44,7 @@ function App() {
       </Grid>
       <FilterPanel />
       <List>
-      {toDoList.map(({id, task, date, done}) => <ToDoListItem task={task}  date={date} done={done} key={id} />)}
+      {toDoList.map(({id, task, date, done}) => <ToDoListItem task={task}  date={date} done={done} id={id} onCheck={changeDoneStatus} />)}
       </List>
       
 
