@@ -14,16 +14,34 @@ function App() {
   const [sortParam, setSortParam] = useState({ done: null, date: "descending" });
   const [sortListItem, setSortListItem] = useState([]);
 
+  useEffect(() => {
+    if (sortParam.date === "ascending") {
+      setToDoList(list => list.sort((a, b) => a.id - b.id));
+    } else {
+      setToDoList(list => list.sort((a, b) => b.id - a.id));
+    }
 
+
+    if (sortParam.done === "true") {
+      const newarr =  toDoList.filter(item => item.done === true);
+      setSortListItem(newarr);
+    } else if (sortParam.done === "false" ) {
+      const newarr =  toDoList.filter(item => item.done === false);
+      setSortListItem(newarr);
+    } else {
+      const newarr =  toDoList.filter(item => item);
+      setSortListItem(newarr);
+    }
+
+
+  }, [sortParam, toDoList]);
 
     const createNewToDo = (e) => {
       if(e.key === "Enter" && e.target.value) {
         setToDoList(prev => [{id: Date.now(),  task: e.target.value.trim(), date: new Date(Date.now()).toLocaleString(), done: false }, ...prev]);
       };
     };
-    const changeToDoItem = (e) =>{
 
-    }
     const changeDoneStatus = (e) => {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.value); 
         const newArr = [...(toDoList.filter((item, index) => index !== taskId)), {...toDoList[taskId], done: !toDoList[taskId].done }];
@@ -39,35 +57,12 @@ function App() {
 
 
     const taskSort = (e) => {
-      setSortParam(param => ({...param, date: e.target.value}) );
+      setSortParam(param => ({...param, date: e.currentTarget.value}) );
     };
     const doneSort = (e) => {
-      console.log(e.currentTarget.value);
       setSortParam(param => ({...param, done: e.currentTarget.value}) );
     }
     
-
-    useEffect(() => {
-      if (sortParam.date === "ascending") {
-        setToDoList(list => list.sort((a, b) => a.id - b.id));
-      } else {
-        setToDoList(list => list.sort((a, b) => b.id - a.id));
-      }
-      if (sortParam.done === "true") {
-        const newarr =  toDoList.filter(item => item.done === true);
-        setSortListItem(newarr);
-      } else if (sortParam.done === "false" ) {
-        const newarr =  toDoList.filter(item => item.done === false);
-        setSortListItem(newarr);
-      } else {
-        const newarr =  toDoList.filter(item => item);
-        setSortListItem(newarr);
-      }
-
-
-    }, [sortParam, toDoList]);
-
-  
 
 
   return (
@@ -83,7 +78,7 @@ function App() {
       <List>
  
       
-      {sortListItem.map(({id, task, date, done}) => <ToDoListItem task={task}  date={date} done={done} id={id} onCheck={changeDoneStatus} onDelete={deleteToDoItem}/>)}
+      {sortListItem.map(task => <ToDoListItem key={task.id} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem}/>)}
       
       </List>
     </Container>
@@ -93,4 +88,3 @@ function App() {
 }
 
 export default App;
-//     {toDoList.map(({id, task, date, done}) => <ToDoListItem task={task}  date={date} done={done} id={id} onCheck={changeDoneStatus} onDelete={deleteToDoItem}/>)}

@@ -10,7 +10,7 @@ export const FilterPanel = ({onChange, sortParam, doneSort}) => {
         <DoneSort onChange={doneSort} />
       </Grid>
       <Grid item xs={6} alignItems="center" container>
-        <Typography variant="subtitle1" gutterBottom>Sort by date</Typography>
+        <Typography variant="subtitle1">Sort by:</Typography>
         <DateSort onChange={onChange} dataSort={sortParam.date} />
       </Grid>
     </Grid>

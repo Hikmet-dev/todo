@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ListItemText , ListItem, ListItemIcon, ListItemSecondaryAction, IconButton, Checkbox, Input } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-export const ToDoListItem = ({task, date, done, id, onCheck, onDelete}) => {
+export const ToDoListItem = ({task, key, onCheck, onDelete}) => {
   const [chanher, setChanher] = useState(false);
 
   const showInput = (e) => {
@@ -10,17 +10,31 @@ export const ToDoListItem = ({task, date, done, id, onCheck, onDelete}) => {
   }; 
 
  return(
-    <ListItem key={id} button >
+    <ListItem key={key} button >
       <ListItemIcon>
-        <Checkbox color="primary"  onChange={onCheck} checked={done} value={id} />
+        <Checkbox 
+          color="primary"  
+          onChange={onCheck} 
+          checked={task.done} 
+          value={task.id} 
+        />
       </ListItemIcon>
       {chanher 
-        ? (<Input defaultValue={task} onBlur={e => showInput(e)} onKeyPress={e => e.key === "Escape" && setChanher(false)} />) 
-        : (<ListItemText  primary={task}  onClick={e => showInput(e)}/>)}
+        ? (<Input 
+            defaultValue={task.task} 
+            autoFocus="true" 
+            onBlur={e => showInput(e)} 
+            onKeyDown={e => e.key === "Escape" && setChanher(false)} 
+          />) 
+        : (<ListItemText  
+            primary={task.task}  
+            onClick={e => showInput(e)}
+          />)
+      }
         
-        <ListItemText  primary={date} />
+        <ListItemText  primary={task.date} />
         <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="delete" onClick={onDelete} value={id}>
+                    <IconButton edge="end" aria-label="delete" onClick={onDelete} value={task.id}>
                       <DeleteIcon />
                     </IconButton>
         </ListItemSecondaryAction>
