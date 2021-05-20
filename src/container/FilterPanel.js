@@ -7,7 +7,7 @@ export const FilterPanel = ({onChange, sortParam, doneSort}) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={6}>
-        <DoneSort onChange={doneSort} />
+        <DoneSort onChange={doneSort} doneSort={sortParam.done} />
       </Grid>
       <Grid item xs={6} alignItems="center" container>
         <Typography variant="subtitle1">Sort by:</Typography>
