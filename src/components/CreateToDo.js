@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextField } from '@material-ui/core';
 
-export default function CreateToDo({onChange, onKeyPress, valueNew}) {
+export default function CreateToDo({onKeyPress}) {
+    const [newToDo, setNewToDo] = useState('');
+    const handleNewToDo = (e) => {
+        setNewToDo(e.target.value);
+      };
     return (
-        <TextField id="outlined-basic" label="New to do" variant="outlined" size="small" fullWidth type="text" value={valueNew} onChange={onChange} onKeyUp={onKeyPress} />
+        <TextField 
+            id="outlined-basic" 
+            label="New to do" 
+            variant="outlined" 
+            size="small" 
+            fullWidth 
+            type="text" 
+            value={newToDo} 
+            onChange={e => handleNewToDo(e)} 
+            onKeyPress={onKeyPress} 
+            onKeyUp={e => e.key === "Enter" && setNewToDo('')} 
+        />
         )
 }

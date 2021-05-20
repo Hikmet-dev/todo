@@ -6,7 +6,6 @@ export default function DateSort({dataSort, onChange}) {
         <TextField
         id="outlined-select-currency"
         select
-        label="Select"
         variant="outlined"
         value={dataSort}
         onChange={onChange}

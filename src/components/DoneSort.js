@@ -6,9 +6,9 @@ export default function DoneSort({onChange}) {
 
     return (
     <ButtonGroup color="primary" aria-label="outlined primary button group">
-    <Button onClick={(e) => onChange(e)} >All</Button>
-    <Button onClick={(e) => onChange(e)} >Done</Button>
-    <Button onClick={(e) => onChange(e)} >Undone</Button>
+    <Button onClick={onChange} value="none">All</Button>
+    <Button onClick={onChange} value="true">Done</Button>
+    <Button onClick={onChange} value="false" >Undone</Button>
     </ButtonGroup>
 
     )
