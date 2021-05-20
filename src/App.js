@@ -22,7 +22,7 @@ function App() {
       if(e.key === "Enter" && e.target.value) {
         setToDoList(prev => [{id: Date.now(),  task: e.target.value.trim(), date: new Date(Date.now()).toLocaleString(), done: false }, ...prev]);
         setNewToDo('')
-        console.log(toDoList);
+
       };
     };
 
@@ -30,17 +30,21 @@ function App() {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.value); 
         const newArr = [...(toDoList.filter((item, index) => index !== taskId)), {...toDoList[taskId], done: !toDoList[taskId].done }];
         setToDoList(newArr);
-        console.log(newArr);
-
-
       };
+
+
+    const deleteToDoItem = (e) => {
+      const taskId = toDoList.findIndex(item => item.id.toString() === e.currentTarget.value);
+      const newArr = toDoList.filter((item, index) => index !== taskId);
+      setToDoList(newArr);
+    };
 
 
     const taskSort = (e) => {
       setSortParam(param => ({...param, date: e.target.value}) );
     };
     const doneSort = (e) => {
-      console.log(e.target);
+
       // setSortParam(param => ({...param, date: e.target.value}) );
     }
     
@@ -67,7 +71,7 @@ function App() {
       </Grid>
       <FilterPanel onChange={taskSort} sortParam={sortParam} doneSort={doneSort} />
       <List>
-      {toDoList.map(({id, task, date, done}) => <ToDoListItem task={task}  date={date} done={done} id={id} onCheck={changeDoneStatus} />)}
+      {toDoList.map(({id, task, date, done}) => <ToDoListItem task={task}  date={date} done={done} id={id} onCheck={changeDoneStatus} onDelete={deleteToDoItem}/>)}
       </List>
     </Container>
 
