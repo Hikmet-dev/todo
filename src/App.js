@@ -12,25 +12,28 @@ function App() {
   
   const [toDoList, setToDoList] = useState([]);
   const [sortParam, setSortParam] = useState({ done: "all", date: "ascending" });
-  const [activePage, setActivePage] = useState(0);
-  const [itemPerPage] = useState(5);
-  const [itemPerPageNow, setItemPerPageNow] = useState({firs: 0, last: itemPerPage});
+  const [activePage, setActivePage] = useState(1);
+  const [itemPerPage, setItemPerPage] = useState(5);
+  const [pageCount, setPageCount] = useState(0)
+
 
 
 
 
   const clickOnPage = (e) => {
     setActivePage(Number(e.currentTarget.value));
-    const first = (Number(e.currentTarget.value) - 1) * itemPerPage;
-    const last = Number(e.currentTarget.value) * itemPerPage;
-    setItemPerPageNow({firs: first, last: last});
+
+  };
+
+  const changeItemPerPageFilter = (e) => {
+      setItemPerPage(e.target.value)
 
   };
 
 
-
-
   const sortListToDo = useMemo(() => {
+    
+
     let newArr;
     switch (sortParam.done) {
       case 'all':
@@ -39,8 +42,18 @@ function App() {
       default:
         newArr = toDoList.filter(item => item.done.toString() === sortParam.done);
     };
-    return newArr.sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
-  }, [sortParam, toDoList])
+    setPageCount(newArr.length % itemPerPage ? Math.floor(newArr.length / itemPerPage) + 1 : newArr.length / itemPerPage);
+    // setActivePage(param => param <= pageCount ? param : pageCount);
+    const startitem = (activePage - 1) * itemPerPage;
+    const endItem = activePage * itemPerPage;
+    const newArwe = newArr.slice(startitem, endItem).sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
+    
+    
+    return newArwe;
+    
+    
+
+  }, [toDoList, activePage, itemPerPage, sortParam])
 
 
 
@@ -56,9 +69,10 @@ function App() {
         const newtaskList = [...toDoList];
         newtaskList[taskId].done = e.target.checked;
         setToDoList(newtaskList);
+
       };
 
-      
+
     const changeTask = (e) => {
       if (e.key === "Enter" && e) {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.name); 
@@ -91,18 +105,24 @@ function App() {
       <Typography variant="h1" component="h2" align="center">To do list</Typography>
       <Grid pt={50}>
       <CreateToDo onKeyPress={createNewToDo} />
-      
-      
-      
       </Grid>
-      <FilterPanel onChange={taskSort} sortParam={sortParam} doneSort={doneSort} />
+      <FilterPanel 
+        onChange={taskSort} 
+        sortParam={sortParam} 
+        doneSort={doneSort} 
+        onChangeItemFilter={changeItemPerPageFilter}
+        itemPerPage={itemPerPage} />
+      <Grid>
+      {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePage}  /> }
+      </Grid>
+
       <List>
 
-      {sortListToDo.slice(itemPerPageNow.firs, itemPerPageNow.last).map(task => <ToDoListItem task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)}
+      {sortListToDo.map(task => <ToDoListItem key={task.id} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)}
       
       </List>
 
-    {sortListToDo.length >= itemPerPage && <Pagination onPageNow={clickOnPage} pageCount={sortListToDo.length % itemPerPage ? Math.floor(sortListToDo.length / itemPerPage + 1) : sortListToDo.length / itemPerPage } activePage={activePage}  /> }
+    
     
     </Container>
 

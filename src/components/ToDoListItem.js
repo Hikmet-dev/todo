@@ -10,7 +10,7 @@ export const ToDoListItem = ({task, onCheck, onDelete, onChange}) => {
   }; 
 
  return(
- <ListItem key={`item-${task.id}-14`}>
+ <ListItem>
       <ListItemIcon>
         <Checkbox 
           color="primary"  
