@@ -7,36 +7,39 @@ import { ToDoListItem } from './components/ToDoListItem';
 import { Pagination } from './components/Pagination'
 
 
-const falsy = /^(?:f(?:alse)?|no?|0+)$/i;
-Boolean.parse = val => !falsy.test(val) && !!val;
-
 
 function App() {
   
   const [toDoList, setToDoList] = useState([]);
   const [sortParam, setSortParam] = useState({ done: "all", date: "ascending" });
+  const [activePage, setActivePage] = useState(0);
+  const [itemPerPage] = useState(5);
+  const [itemPerPageNow, setItemPerPageNow] = useState({firs: 0, last: itemPerPage});
 
 
 
-  
+
+  const clickOnPage = (e) => {
+    setActivePage(Number(e.currentTarget.value));
+    const first = (Number(e.currentTarget.value) - 1) * itemPerPage;
+    const last = Number(e.currentTarget.value) * itemPerPage;
+    setItemPerPageNow({firs: first, last: last});
+
+  };
+
 
 
 
   const sortListToDo = useMemo(() => {
-
     let newArr;
     switch (sortParam.done) {
-      case 'true' || 'false':
-        newArr = toDoList.filter(item => item.done.toString() === sortParam.done);
+      case 'all':
+        newArr = toDoList;
         break;
       default:
-        newArr = toDoList;
+        newArr = toDoList.filter(item => item.done.toString() === sortParam.done);
     };
-    const newter = newArr.sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
-
-    return newter
-
- 
+    return newArr.sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
   }, [sortParam, toDoList])
 
 
@@ -55,6 +58,7 @@ function App() {
         setToDoList(newtaskList);
       };
 
+      
     const changeTask = (e) => {
       if (e.key === "Enter" && e) {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.name); 
@@ -83,7 +87,7 @@ function App() {
 
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Typography variant="h1" component="h2" align="center">To do list</Typography>
       <Grid pt={50}>
       <CreateToDo onKeyPress={createNewToDo} />
@@ -94,12 +98,12 @@ function App() {
       <FilterPanel onChange={taskSort} sortParam={sortParam} doneSort={doneSort} />
       <List>
 
-      {sortListToDo.slice(0, 5).map(task => <ToDoListItem task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)}
+      {sortListToDo.slice(itemPerPageNow.firs, itemPerPageNow.last).map(task => <ToDoListItem task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)}
       
       </List>
 
-
-    <Pagination />
+    {sortListToDo.length >= itemPerPage && <Pagination onPageNow={clickOnPage} pageCount={sortListToDo.length % itemPerPage ? Math.floor(sortListToDo.length / itemPerPage + 1) : sortListToDo.length / itemPerPage } activePage={activePage}  /> }
+    
     </Container>
 
 
