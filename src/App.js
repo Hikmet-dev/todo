@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useState, useMemo } from 'react';
 
 import { Container, Grid, Typography, List } from '@material-ui/core';
 import CreateToDo  from './components/CreateToDo';
@@ -12,22 +12,28 @@ Boolean.parse = val => !falsy.test(val) && !!val;
 function App() {
   
   const [toDoList, setToDoList] = useState([]);
-  const [sortParam, setSortParam] = useState({ done: "all", date: "descending" });
-  const [sortListItem, setSortListItem] = useState([]);
+  const [sortParam, setSortParam] = useState({ done: "all", date: "ascending" });
 
 
 
-  useEffect(() => {
+  
+
+
+
+  const sortListToDo = useMemo(() => {
     if (sortParam.done !== "all") {
       const newArr = toDoList.filter(item => item.done === Boolean.parse(sortParam.done))
-                              .sort((a, b) =>  sortParam.date ===  "descending" ? b.id - a.id : a.id - b.id);
-      setSortListItem(newArr);
+                              .sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
+      return newArr
     } else {
-      const newArr = toDoList.sort((a, b) =>  sortParam.date ===  "descending" ? b.id - a.id : a.id - b.id);;
-      setSortListItem(newArr);
+      const newArr = toDoList.sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
+      return newArr
+      
     }
+    
+  }, [sortParam, toDoList])
 
-  }, [sortParam, toDoList]);
+
 
 
     const createNewToDo = (e) => {
@@ -38,15 +44,19 @@ function App() {
 
     const changeDoneStatus = (e) => {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.value); 
-        const newArr = [...(toDoList.filter((item, index) => index !== taskId)), {...toDoList[taskId], done: !toDoList[taskId].done }];
-        setToDoList(newArr);
+        const newtaskList = toDoList.slice();
+        newtaskList[taskId].done = e.target.checked;
+        setToDoList(newtaskList);
       };
+
     const changeTask = (e) => {
       if (e.key === "Enter" && e) {
-        console.log(e.target.value);
+        const taskId = toDoList.findIndex(item => item.id.toString() === e.target.name); 
+        const newtaskList = toDoList.slice();
+        newtaskList[taskId].task = e.target.value;
+        setToDoList(newtaskList);
       } 
-      
-      
+            
     }
 
 
@@ -77,11 +87,11 @@ function App() {
       </Grid>
       <FilterPanel onChange={taskSort} sortParam={sortParam} doneSort={doneSort} />
       <List>
- 
-      
-      {sortListItem.map(task => <ToDoListItem key={task.id} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)}
+
+      {sortListToDo.slice(0, 5).map(task => <ToDoListItem task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)}
       
       </List>
+
     </Container>
 
 

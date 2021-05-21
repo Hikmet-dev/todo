@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ListItemText , ListItem, ListItemIcon, ListItemSecondaryAction, IconButton, Checkbox, Input } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-export const ToDoListItem = ({task, key, onCheck, onDelete, onChange}) => {
+export const ToDoListItem = ({task, onCheck, onDelete, onChange}) => {
   const [chanher, setChanher] = useState(false);
 
   const showInput = (e) => {
@@ -10,7 +10,7 @@ export const ToDoListItem = ({task, key, onCheck, onDelete, onChange}) => {
   }; 
 
  return(
-    <ListItem key={key} button >
+ <ListItem key={`item-${task.id}-14`}>
       <ListItemIcon>
         <Checkbox 
           color="primary"  
@@ -21,8 +21,9 @@ export const ToDoListItem = ({task, key, onCheck, onDelete, onChange}) => {
       </ListItemIcon>
       {chanher 
         ? (<Input 
-            defaultValue={task.task} 
-            autoFocus="true" 
+            defaultValue={task.task}
+            autoFocus={true}
+            name={`${task.id}`}
             onBlur={e => showInput(e)} 
             onKeyDown={e => e.key === "Escape" && setChanher(false)} 
             onKeyPress={onChange}
@@ -41,5 +42,6 @@ export const ToDoListItem = ({task, key, onCheck, onDelete, onChange}) => {
                     </IconButton>
         </ListItemSecondaryAction>
     </ListItem>
+   
  )   
-}
+};
