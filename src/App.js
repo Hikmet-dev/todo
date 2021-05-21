@@ -4,6 +4,8 @@ import { Container, Grid, Typography, List } from '@material-ui/core';
 import CreateToDo  from './components/CreateToDo';
 import { FilterPanel } from './container/FilterPanel';
 import { ToDoListItem } from './components/ToDoListItem';
+import { Pagination } from './components/Pagination'
+
 
 const falsy = /^(?:f(?:alse)?|no?|0+)$/i;
 Boolean.parse = val => !falsy.test(val) && !!val;
@@ -21,16 +23,20 @@ function App() {
 
 
   const sortListToDo = useMemo(() => {
-    if (sortParam.done !== "all") {
-      const newArr = toDoList.filter(item => item.done === Boolean.parse(sortParam.done))
-                              .sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
-      return newArr
-    } else {
-      const newArr = toDoList.sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
-      return newArr
-      
-    }
-    
+
+    let newArr;
+    switch (sortParam.done) {
+      case 'true' || 'false':
+        newArr = toDoList.filter(item => item.done.toString() === sortParam.done);
+        break;
+      default:
+        newArr = toDoList;
+    };
+    const newter = newArr.sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
+
+    return newter
+
+ 
   }, [sortParam, toDoList])
 
 
@@ -44,7 +50,7 @@ function App() {
 
     const changeDoneStatus = (e) => {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.value); 
-        const newtaskList = toDoList.slice();
+        const newtaskList = [...toDoList];
         newtaskList[taskId].done = e.target.checked;
         setToDoList(newtaskList);
       };
@@ -52,7 +58,7 @@ function App() {
     const changeTask = (e) => {
       if (e.key === "Enter" && e) {
         const taskId = toDoList.findIndex(item => item.id.toString() === e.target.name); 
-        const newtaskList = toDoList.slice();
+        const newtaskList = [...toDoList];
         newtaskList[taskId].task = e.target.value;
         setToDoList(newtaskList);
       } 
@@ -92,6 +98,8 @@ function App() {
       
       </List>
 
+
+    <Pagination />
     </Container>
 
 
