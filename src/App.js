@@ -29,7 +29,7 @@ function App() {
   };
 
 
-  const sortListToDo = useMemo(() => {
+  const {sortListToDo, activePageNow} = useMemo(() => {
     
 
     let newArr;
@@ -40,14 +40,18 @@ function App() {
       default:
         newArr = toDoList.filter(item => item.done.toString() === sortParam.done);
     };
-    setPageCount(newArr.length % itemPerPage ? Math.floor(newArr.length / itemPerPage) + 1 : newArr.length / itemPerPage);
-    // setActivePage(param => param <= pageCount ? param : pageCount);
-    const startitem = (activePage - 1) * itemPerPage;
+    const pageCount = newArr.length % itemPerPage ? Math.floor(newArr.length / itemPerPage) + 1 : newArr.length / itemPerPage
+    setPageCount(pageCount);
+
+    const startItem = (activePage - 1) * itemPerPage;
     const endItem = activePage * itemPerPage;
-    const newArwe = newArr.slice(startitem, endItem).sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
+    const newArwe = newArr.slice(startItem, endItem).sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
     
     
-    return newArwe;
+    return    {
+      sortListToDo : newArwe,
+      activePageNow : activePage < pageCount ? activePage : pageCount
+    }             
     
     
 
@@ -111,7 +115,7 @@ function App() {
         onChangeItemFilter={changeItemPerPageFilter}
         itemPerPage={itemPerPage} />
       <Grid item alignItems="center" container xs={12}>
-      {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePage}  /> }
+      {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePageNow}  /> }
       </Grid>
 
       <List>

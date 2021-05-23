@@ -13,10 +13,9 @@ export const  Pagination = ({onPageNow, pageCount, activePage}) =>  {
    
 
     return (
-        <ButtonGroup variant="primary" color="primary" aria-label="contained primary button group">
-            
+        <ButtonGroup  color="primary" aria-label="contained button group">            
             <Button onClick={onPageNow} value="1"><ArrowBackIcon /></Button>
-                {pageArr.map(page => <Button onClick={onPageNow} value={page} variant={ activePage === page &&  'contained'}>{page}</Button>)}
+                {pageArr.map(page => <Button  key={`item-${page}`} onClick={onPageNow} value={page} variant={ activePage === page &&  'contained'}>{page}</Button>)}
             <Button onClick={onPageNow} value={pageArr.length}><ArrowForwardIcon /> </Button>
         </ButtonGroup>
     )
