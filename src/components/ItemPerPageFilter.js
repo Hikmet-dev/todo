@@ -1,11 +1,10 @@
 import React from 'react';
-import { FormControl, Select, MenuItem } from "@material-ui/core";
+import { Select, MenuItem } from "@material-ui/core";
 
 
 
 export const ItemPerPageFilter = ({onChangeItemFilter, itemPerPage}) => {
     return(
-        <FormControl>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
@@ -16,6 +15,5 @@ export const ItemPerPageFilter = ({onChangeItemFilter, itemPerPage}) => {
           <MenuItem value={10}>10</MenuItem>
           <MenuItem value={20}>20</MenuItem>
         </Select>
-      </FormControl>
     )
 }

@@ -4,9 +4,7 @@ import { Container, Grid, Typography, List } from '@material-ui/core';
 import CreateToDo  from './components/CreateToDo';
 import { FilterPanel } from './container/FilterPanel';
 import { ToDoListItem } from './components/ToDoListItem';
-import { Pagination } from './components/Pagination'
-
-
+import { Pagination } from './components/Pagination';
 
 function App() {
   
@@ -103,7 +101,7 @@ function App() {
   return (
     <Container maxWidth="md">
       <Typography variant="h1" component="h2" align="center">To do list</Typography>
-      <Grid pt={50}>
+      <Grid item pt={50}>
       <CreateToDo onKeyPress={createNewToDo} />
       </Grid>
       <FilterPanel 
@@ -112,7 +110,7 @@ function App() {
         doneSort={doneSort} 
         onChangeItemFilter={changeItemPerPageFilter}
         itemPerPage={itemPerPage} />
-      <Grid>
+      <Grid item alignItems="center" container xs={12}>
       {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePage}  /> }
       </Grid>
 

@@ -12,7 +12,7 @@ export default function CreateToDo({onKeyPress}) {
             label="New to do" 
             variant="outlined" 
             size="small" 
-            fullWidth 
+            fullWidth={true} 
             type="text" 
             value={newToDo} 
             onChange={e => handleNewToDo(e)} 
