@@ -1,6 +1,6 @@
-import React, {  useState, useMemo } from 'react';
+import React, {  useState, useEffect } from 'react';
 
-import { Container, Grid, Typography, List, CircularProgress  } from '@material-ui/core';
+import { Container, Grid, Typography, List, CircularProgress, SnackbarContent  } from '@material-ui/core';
 import CreateToDo  from './components/CreateToDo';
 import { FilterPanel } from './container/FilterPanel';
 import { ToDoListItem } from './components/ToDoListItem';
@@ -11,15 +11,17 @@ const getURL = 'https://todo-api-learning.herokuapp.com/v1/tasks/6';
 const postURL = 'https://todo-api-learning.herokuapp.com/v1/task/6';
 
 
-
+ 
 function App() {
   
   const [toDoList, setToDoList] = useState([]);
+  const [newToDO, setNewToDO] = useState([]);
   const [sortParam, setSortParam] = useState({ done: "all", date: "ascending" });
+  const [pageCount, setPageCount] = useState(1);
   const [activePage, setActivePage] = useState(1);
   const [itemPerPage, setItemPerPage] = useState(5);
-  const [pageCount, setPageCount] = useState(0);
   const [loadStatus, setLoadStatus] = useState({isLoading: true, error: null});
+
 
 
 
@@ -37,47 +39,50 @@ function App() {
 
 
 
-  const {activePageNow} = useMemo(() => {
+
+  useEffect(() => {
+    let doneParam;
 
 
-      axios.get(`${getURL}?order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`).then(res => {setToDoList(res.data); setLoadStatus(param => ({...param, isLoading: true}))}).catch(err => setLoadStatus(param => ({...param, error : err})));
-    
-
-    
-
-    let newArr;
-    switch (sortParam.done) {
-      case 'all':
-        newArr = [...toDoList];
+    switch(sortParam.done) {
+      case 'true': 
+         doneParam = 'filterBy=done&';
+      break;
+      case 'false':
+        doneParam = 'filterBy=undone&';
         break;
       default:
-        newArr = [...toDoList].filter(item => item.done.toString() === sortParam.done);
-        break
+        doneParam = '';
+        break;
     };
-    const pageCount = newArr.length % itemPerPage ? Math.floor(newArr.length / itemPerPage) + 1 : newArr.length / itemPerPage
-    setPageCount(pageCount);
 
-    const startItem = (activePage - 1) * itemPerPage;
-    const endItem = activePage * itemPerPage;
-    const newArwe = newArr.slice(startItem, endItem).sort((a, b) =>  sortParam.date ===  "ascending" ? b.id - a.id : a.id - b.id);
+    axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`)
+    .then(res => {const pageCountN = res.data.length % itemPerPage 
+      ? Math.floor(res.data.length / itemPerPage) 
+      : res.data.length / itemPerPage;
+      const activePageN = activePage <= pageCountN ? activePage : pageCountN;
+      setActivePage(activePageN);
+      setPageCount(pageCountN);
+      const startItem = (activePageN - 1) * itemPerPage;
+      const endItem = activePageN * itemPerPage;
+      return {data : res.data, startItem : startItem, endItem : endItem}})
+    .then(({data,  startItem, endItem}) => {setToDoList(data.slice(startItem, endItem)); console.log(data.slice(startItem, endItem))})
+    .then(setLoadStatus(param => ({...param, isLoading: true})))
+    .catch(err => setLoadStatus(param => ({...param, error : err})));
     
-    
-    return    {
-      sortListToDo : newArwe,
-      activePageNow : activePage < pageCount ? activePage : pageCount,
-    }             
-    
-    
+    console.log("memo");
 
-  }, [toDoList, activePage, itemPerPage, sortParam])
+
+  }, [sortParam, itemPerPage, activePage, pageCount, newToDO]);
+
 
 
 
 
     const createNewToDo = (e) => {
-      if(e.key === "Enter" && e.target.value) {
-        setToDoList(prev => [{id: Date.now(),  task: e.target.value.trim(), date: new Date(Date.now()).toLocaleString(), done: false }, ...prev]);
+      if(e.key === "Enter" && e.target.value.trim()) {
         axios.post(postURL, {name: e.target.value.trim(), done: false}).then(result => console.log(result)).catch(error => console.log(error));
+        setNewToDO([e.target.value.trim()]);
       };
     };
 
@@ -136,14 +141,14 @@ function App() {
         onChangeItemFilter={changeItemPerPageFilter}
         itemPerPage={itemPerPage} />
       <Grid item alignItems="center" container xs={12}>
-      {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePageNow}  /> }
+      {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePage}  /> }
       </Grid>
 
       <List>
 {loadStatus.isLoading 
         ?  (toDoList.map(task => <ToDoListItem key={task.uuid} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)) 
         : <CircularProgress />}
-     
+     {loadStatus.error &&  <SnackbarContent message={loadStatus.error.message} />}
       
       </List>
 
