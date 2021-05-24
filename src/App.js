@@ -35,10 +35,11 @@ function App() {
     let newArr;
     switch (sortParam.done) {
       case 'all':
-        newArr = toDoList;
+        newArr = [...toDoList];
         break;
       default:
-        newArr = toDoList.filter(item => item.done.toString() === sortParam.done);
+        newArr = [...toDoList].filter(item => item.done.toString() === sortParam.done);
+        break
     };
     const pageCount = newArr.length % itemPerPage ? Math.floor(newArr.length / itemPerPage) + 1 : newArr.length / itemPerPage
     setPageCount(pageCount);
