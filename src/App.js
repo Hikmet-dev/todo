@@ -1,4 +1,4 @@
-import React, {  useState, useEffect } from 'react';
+import React, {  useState, useEffect, useMemo } from 'react';
 
 import { Container, Grid, Typography, List, CircularProgress, SnackbarContent  } from '@material-ui/core';
 import CreateToDo  from './components/CreateToDo';
@@ -79,6 +79,54 @@ function App() {
 
 
 
+
+  const { getToDoList, getActivePage, getPageCount } = useMemo(() => {
+
+    let doneParam;
+
+
+    switch(sortParam.done) {
+      case 'true': 
+         doneParam = 'filterBy=done&';
+      break;
+      case 'false':
+        doneParam = 'filterBy=undone&';
+        break;
+      default:
+        doneParam = '';
+        break;
+    };
+
+    let getToDoList;
+    let getActivePage;
+    let getPageCount;
+
+    axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`)
+    .then(res => {const pageCountN = res.data.length % itemPerPage 
+      ? Math.floor(res.data.length / itemPerPage) 
+      : res.data.length / itemPerPage;
+      const activePageN = activePage <= pageCountN ? activePage : pageCountN;
+      getActivePage = activePageN;
+      getPageCount = pageCountN;
+      const startItem = (activePageN - 1) * itemPerPage;
+      const endItem = activePageN * itemPerPage;
+      return {data : res.data, startItem : startItem, endItem : endItem}})
+    .then(({data,  startItem, endItem}) => {getToDoList = data.slice(startItem, endItem); console.log(data.slice(startItem, endItem))})
+    .then(setLoadStatus(param => ({...param, isLoading: true})))
+    .catch(err => setLoadStatus(param => ({...param, error : err})));
+
+
+
+
+    return {
+      getToDoList: getToDoList,
+      getActivePage : getActivePage,
+      getPageCount : getPageCount
+
+    }
+  }, [sortParam, itemPerPage, activePage])
+
+
     const createNewToDo = (e) => {
       if(e.key === "Enter" && e.target.value.trim()) {
         axios.post(postURL, {name: e.target.value.trim(), done: false}).then(result => console.log(result)).catch(error => console.log(error));
@@ -87,10 +135,6 @@ function App() {
     };
 
     const changeDoneStatus = (e) => {
-        // const taskId = toDoList.findIndex(item => item.id.toString() === e.target.value); 
-        // const newtaskList = [...toDoList];
-        // newtaskList[taskId].done = e.target.checked;
-        // setToDoList(newtaskList);
 
         axios.patch(`${postURL}/${e.target.value}`, {done: e.target.checked}).then(res => console.log(res)).catch(err => console.log(err));
 
@@ -99,10 +143,6 @@ function App() {
 
     const changeTask = (e) => {
       if (e.key === "Enter" && e.target.value.trim()) {
-        // const taskId = toDoList.findIndex(item => item.id.toString() === e.target.name); 
-        // const newtaskList = [...toDoList];
-        // newtaskList[taskId].task = e.target.value;
-        // setToDoList(newtaskList);
 
         axios.patch(`${postURL}/${e.target.name}`, {name : e.target.value}).then(res => console.log(res)).catch(err => console.log(err));
       } 
@@ -111,10 +151,6 @@ function App() {
 
 
     const deleteToDoItem = (e) => {
-      // const taskId = toDoList.findIndex(item => item.id.toString() === e.currentTarget.value);
-      // const newArr = toDoList.filter((item, index) => index !== taskId);
-      // setToDoList(newArr);
-
       axios.delete(`${postURL}/${e.currentTarget.value}`).then(res => console.log(res)).catch(err => console.log(err));
     };
 
@@ -141,7 +177,7 @@ function App() {
         onChangeItemFilter={changeItemPerPageFilter}
         itemPerPage={itemPerPage} />
       <Grid item alignItems="center" container xs={12}>
-      {pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePage}  /> }
+        {loadStatus.isLoading && (pageCount > 1 && <Pagination onPageNow={clickOnPage} pageCount={pageCount} activePage={activePage}  />) }
       </Grid>
 
       <List>
