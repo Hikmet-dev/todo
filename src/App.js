@@ -1,4 +1,4 @@
-import React, {  useState, useEffect, useMemo } from 'react';
+import React, {  useState, useEffect} from 'react';
 
 import { Container, Grid, Typography, List, CircularProgress, SnackbarContent  } from '@material-ui/core';
 import CreateToDo  from './components/CreateToDo';
@@ -11,7 +11,17 @@ const getURL = 'https://todo-api-learning.herokuapp.com/v1/tasks/6';
 const postURL = 'https://todo-api-learning.herokuapp.com/v1/task/6';
 
 
- 
+
+
+
+
+
+
+
+
+
+
+
 function App() {
   
   const [toDoList, setToDoList] = useState([]);
@@ -22,57 +32,17 @@ function App() {
   const [loadStatus, setLoadStatus] = useState({isLoading: false, error: null});
 
 
+  axios.interceptors.response.use(undefined, function aziosSatta(error) {
+    if( error.response.status === 422 || error.response.status === 404 || error.response.status === 400 ) {
+      setLoadStatus(param => ({...param, error : error}))
+    }
+    return Promise.reject(error);
+  })
 
 
-
-
-
-
-
-
-  // useEffect(() => {
-  //   let doneParam;
-
-
-  //   switch(sortParam.done) {
-  //     case 'true': 
-  //        doneParam = 'filterBy=done&';
-  //     break;
-  //     case 'false':
-  //       doneParam = 'filterBy=undone&';
-  //       break;
-  //     default:
-  //       doneParam = '';
-  //       break;
-  //   };
-
-  //   axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`)
-  //   .then(res => {const pageCountN = res.data.length % itemPerPage 
-  //     ? Math.floor(res.data.length / itemPerPage) 
-  //     : res.data.length / itemPerPage;
-  //     const activePageN = activePage <= pageCountN ? activePage : pageCountN;
-  //     setActivePage(activePageN);
-  //     setPageCount(pageCountN);
-  //     const startItem = (activePageN - 1) * itemPerPage;
-  //     const endItem = activePageN * itemPerPage;
-  //     return {data : res.data, startItem : startItem, endItem : endItem}})
-  //   .then(({data,  startItem, endItem}) => {setToDoList(data.slice(startItem, endItem));})
-  //   .then(() => setLoadStatus(param => ({...param, isLoading: true})))
-  //   .catch(err => setLoadStatus(param => ({...param, error : err})));
-    
-  //   console.log("memo");
-
-
-  // }, [sortParam, itemPerPage, activePage]);
-
-
-
-
-
-
-  const { getToDoList, getActivePage, getPageCount, isLoading } = useMemo(async () => {
-
+  useEffect(() => {
     let doneParam;
+
 
     switch(sortParam.done) {
       case 'true': 
@@ -86,50 +56,37 @@ function App() {
         break;
     };
 
+    axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`)
+    .then(res => {const pageCountN = res.data.length % itemPerPage 
+      ? Math.floor(res.data.length / itemPerPage) 
+      : res.data.length / itemPerPage;
+      const activePageN = activePage <= pageCountN ? activePage : pageCountN;
+      setActivePage(activePageN);
+      setPageCount(pageCountN);
+      const startItem = (activePageN - 1) * itemPerPage;
+      const endItem = activePageN * itemPerPage;
+      return {data : res.data, startItem : startItem, endItem : endItem}})
+    .then(({data,  startItem, endItem}) => {setToDoList(data.slice(startItem, endItem));})
+    .then(() => setLoadStatus(param => ({...param, isLoading: true})))
+    
 
+  }, [sortParam, itemPerPage, activePage]);
 
-    const getToDoList = await axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`).then(res => res.data);
-    const countrer =   getToDoList.length % itemPerPage ? Math.floor(getToDoList.length / itemPerPage ) + 1 : getToDoList.length / itemPerPage;
-    const activePageN = activePage <= countrer ? activePage : countrer;
-
-    console.log(getToDoList);
-    const toDoListSlice = await getToDoList.slice((activePageN - 1) * countrer, activePageN * countrer);
-
-    console.log(toDoListSlice);
-
-
-    const changeLoadStatus = async (toDoListSlice) => {
-      if (!toDoListSlice) {
-        setLoadStatus(param => ({...param, isLoading: true}));
-        return true;
-      }
-      return false
-    };
-
-    const dadsaas = await changeLoadStatus(toDoListSlice)
-    console.log(dadsaas);
-
-    return {
-      getToDoList: toDoListSlice,
-      getActivePage : getActivePage,
-      getPageCount : getPageCount, 
-      isLoading : dadsaas
-
-    }
-  }, [sortParam, itemPerPage, activePage])
 
 
 
 
     const createNewToDo = (e) => {
       if(e.key === "Enter" && e.target.value.trim()) {
-        axios.post(postURL, {name: e.target.value.trim(), done: false}).then(result => console.log(result)).catch(error => console.log(error));
+        axios.post(postURL, {name: e.target.value.trim(), done: false})
+          .then(resp => setToDoList(item => ([resp.data, ...item]) ))
+
       };
     };
 
-    const changeDoneStatus = (e) => {
+    const changeDoneStatus = async (e) => {
+      axios.patch(`${postURL}/${e.target.value}`, {done: e.target.checked});
 
-        axios.patch(`${postURL}/${e.target.value}`, {done: e.target.checked}).then(res => console.log(res)).catch(err => console.log(err));
 
       };
 
@@ -137,14 +94,14 @@ function App() {
     const changeTask = (e) => {
       if (e.key === "Enter" && e.target.value.trim()) {
 
-        axios.patch(`${postURL}/${e.target.name}`, {name : e.target.value}).then(res => console.log(res)).catch(err => console.log(err));
+        axios.patch(`${postURL}/${e.target.name}`, {name : e.target.value}).then(res => console.log(res));
       } 
             
     }
 
 
     const deleteToDoItem = (e) => {
-      axios.delete(`${postURL}/${e.currentTarget.value}`).then(res => console.log(res)).catch(err => console.log(err));
+      axios.delete(`${postURL}/${e.currentTarget.value}`).then(res => console.log(res));
     };
     
     const clickOnPage = (e) => {
@@ -184,7 +141,7 @@ function App() {
 
       <List>
 {loadStatus.isLoading
-        ?  (getToDoList.map(task => <ToDoListItem key={task.uuid} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)) 
+        ?  (toDoList.map(task => <ToDoListItem key={task.uuid} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)) 
         : <CircularProgress />}
      {loadStatus.error &&  <SnackbarContent message={loadStatus.error.message} />}
       
