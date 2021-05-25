@@ -31,7 +31,8 @@ function App() {
   const [itemPerPage, setItemPerPage] = useState(5);
   const [loadStatus, setLoadStatus] = useState({isLoading: false, error: null});
 
-
+  
+  
   axios.interceptors.response.use(undefined, function aziosSatta(error) {
     if( error.response.status === 422 || error.response.status === 404 || error.response.status === 400 ) {
       setLoadStatus(param => ({...param, error : error}))
@@ -41,33 +42,58 @@ function App() {
 
 
   useEffect(() => {
-    let doneParam;
 
 
-    switch(sortParam.done) {
-      case 'true': 
-         doneParam = 'filterBy=done&';
-      break;
-      case 'false':
-        doneParam = 'filterBy=undone&';
+
+    const getToDoListwe = async () => {
+      let doneParam;
+
+
+      switch(sortParam.done) {
+        case 'true': 
+           doneParam = 'filterBy=done&';
         break;
-      default:
-        doneParam = '';
-        break;
+        case 'false':
+          doneParam = 'filterBy=undone&';
+          break;
+        default:
+          doneParam = '';
+          break;
+      };
+  
+      const { data } = await axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`);
+  
+      const paginator = async (data, activePage, itemPerPage) => {
+        const paginCount = await data.length % itemPerPage
+        ? (Math.floor(data.length / itemPerPage) + 1) 
+        : (data.length / itemPerPage);
+  
+      const activePagin = activePage <= paginCount ? activePage : paginCount;
+      const sliceStart =  (activePagin - 1) * itemPerPage;
+      const sliceEnd = activePagin * itemPerPage;
+  
+      return {
+        paginCount: paginCount,
+        activePagin : activePagin,
+        sliceStart : sliceStart,
+        sliceEnd : sliceEnd
+        }
+      };
+      
+      const {paginCount, activePagin, sliceStart, sliceEnd} = await paginator(data, activePage, itemPerPage);
+  
+      setActivePage(activePagin);
+      setPageCount(paginCount);
+  
+      const todolister = await data.slice(sliceStart, sliceEnd);
+      setToDoList(todolister)
+  
+      await setLoadStatus(param => ({...param, isLoading: true}));
     };
 
-    axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`)
-    .then(res => {const pageCountN = res.data.length % itemPerPage 
-      ? Math.floor(res.data.length / itemPerPage) 
-      : res.data.length / itemPerPage;
-      const activePageN = activePage <= pageCountN ? activePage : pageCountN;
-      setActivePage(activePageN);
-      setPageCount(pageCountN);
-      const startItem = (activePageN - 1) * itemPerPage;
-      const endItem = activePageN * itemPerPage;
-      return {data : res.data, startItem : startItem, endItem : endItem}})
-    .then(({data,  startItem, endItem}) => {setToDoList(data.slice(startItem, endItem));})
-    .then(() => setLoadStatus(param => ({...param, isLoading: true})))
+
+    getToDoListwe();
+    
     
 
   }, [sortParam, itemPerPage, activePage]);
