@@ -4,10 +4,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import axios from 'axios';
 
 
-
-
+axios.interceptors.request.use(request => {
+  return request;
+}, error =>{
+  return Promise.reject(error);
+});
 
 
 

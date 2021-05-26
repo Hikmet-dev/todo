@@ -13,7 +13,11 @@ const postURL = 'https://todo-api-learning.herokuapp.com/v1/task/6';
 
 
 
+
 function App() {
+
+
+
   const [toDoList, setToDoList] = useState([]);
   const [sortParam, setSortParam] = useState({ done: "all", date: "ascending" });
   const [pageCount, setPageCount] = useState(1);
@@ -26,7 +30,7 @@ function App() {
   
   axios.interceptors.response.use(undefined, function aziosSatta(error) {
     if( error.response.status === 422 || error.response.status === 404 || error.response.status === 400 ) {
-
+      // console.log('iter');
       setLoadStatus(param => ({...param, error : error}))
       setOpen(true);
     }
@@ -86,9 +90,8 @@ function App() {
     getToDoList();
     
   }, [getToDoList, sortParam]);
-  
-  
-  
+
+ 
   const createNewToDo = async (e) => {
       if(e.key === "Enter" && e.target.value.trim()) {
         await axios.post(postURL, {name: e.target.value.trim(), done: false});
@@ -158,7 +161,7 @@ function App() {
 
   {loadStatus.isLoading
           ?  (toDoList.map(task => <ToDoListItem key={task.uuid} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)) 
-          : <CircularProgress />}
+          :   <CircularProgress />}
 
   {loadStatus.error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                           <Alert severity="error" onClose={handleClose} > 
