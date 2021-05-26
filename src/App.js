@@ -7,7 +7,6 @@ import { FilterPanel } from './container/FilterPanel';
 import { ToDoListItem } from './components/ToDoListItem';
 import { Pagination } from './components/Pagination';
 import axios from 'axios';
-
 const getURL = 'https://todo-api-learning.herokuapp.com/v1/tasks/6';
 const postURL = 'https://todo-api-learning.herokuapp.com/v1/task/6';
 
@@ -19,20 +18,20 @@ function App() {
 
 
   const [toDoList, setToDoList] = useState([]);
-  const [sortParam, setSortParam] = useState({ done: "all", date: "ascending" });
+  const [sortParam, setSortParam] = useState({ done: "", date: "ascending" });
   const [pageCount, setPageCount] = useState(1);
   const [activePage, setActivePage] = useState(1);
   const [itemPerPage, setItemPerPage] = useState(5);
   const [loadStatus, setLoadStatus] = useState({isLoading: false, error: null});
-  const [open, setOpen] =useState(false)
+  const [open, setOpen] = useState(false)
   
   
   
-  axios.interceptors.response.use(undefined, function aziosSatta(error) {
-    if( error.response.status === 422 || error.response.status === 404 || error.response.status === 400 ) {
-      // console.log('iter');
-      setLoadStatus(param => ({...param, error : error}))
+  axios.interceptors.response.use(undefined, (error) =>  {
+    if( [422, 404, 400].includes(error.response?.status) ) {
+      setLoadStatus(param => ({...param, error}))
       setOpen(true);
+      console.log("erroer");
     }
     return Promise.reject(error);
   });
@@ -41,29 +40,24 @@ function App() {
 
    const getToDoList =  useCallback( async () => {
       
-    let doneParam;
-    switch(sortParam.done) {
-      case 'true': 
-         doneParam = 'filterBy=done&';
-      break;
-      case 'false':
-        doneParam = 'filterBy=undone&';
-        break;
-        default:
-          doneParam = '';
-          break;
-        };
+
+        const filterOptions = { 'true': 'done', 'false': 'undone' };
+
+        const { data } = await axios.get(getURL, { 
+          params : { 
+            filterBy: filterOptions[sortParam.done] ?? '', 
+            order : sortParam.date === 'ascending' ? 'asc' : 'desc'   
+          }
+        });
         
-        const { data } = await axios.get(`${getURL}?${doneParam}order=${ sortParam.date === 'ascending' ? 'asc' : 'desc'}`);
-        
-        const paginator = async (data, activePage, itemPerPage) => {
-          const paginCount = await data.length % itemPerPage
+        const paginator =  (data, activePage, itemPerPage) => {
+          const paginCount =  data.length % itemPerPage
           ? (Math.floor(data.length / itemPerPage) + 1) 
           : (data.length / itemPerPage);
           
-          const activePagin = await activePage <= paginCount ? activePage : paginCount;
-          const sliceStart = await (activePagin - 1) * itemPerPage;
-          const sliceEnd = await activePagin * itemPerPage;
+          const activePagin =  activePage <= paginCount ? activePage : paginCount;
+          const sliceStart =  (activePagin - 1) * itemPerPage;
+          const sliceEnd =  activePagin * itemPerPage;
           
           return {
             paginCount: paginCount,
@@ -73,7 +67,7 @@ function App() {
           }
         };
         
-        const {paginCount, activePagin, sliceStart, sliceEnd} = await paginator(data, activePage, itemPerPage);
+        const {paginCount, activePagin, sliceStart, sliceEnd} = paginator(data, activePage, itemPerPage);
         
     setActivePage(activePagin);
     setPageCount(paginCount);
@@ -82,6 +76,8 @@ function App() {
     setToDoList(todolister)
     
     await setLoadStatus(param => ({...param, isLoading: true}));
+
+
   }, [activePage, itemPerPage, sortParam]);
   
   
@@ -89,7 +85,9 @@ function App() {
     
     getToDoList();
     
-  }, [getToDoList, sortParam]);
+console.log('useEf');
+
+  }, [getToDoList]);
 
  
   const createNewToDo = async (e) => {
