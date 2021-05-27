@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField } from '@material-ui/core';
 
-export default function CreateToDo({onKeyPress}) {
+export const  CreateToDo = ({onKeyPress}) =>  {
     const [newToDo, setNewToDo] = useState('');
     const handleNewToDo = (e) => {
         setNewToDo(e.target.value);
