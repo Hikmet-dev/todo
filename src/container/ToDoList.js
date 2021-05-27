@@ -9,15 +9,17 @@ import { FilterPanel } from './FilterPanel';
 
 
 import axios from 'axios';
-const getURL = 'https://todo-api-learning.herokuapp.com/v1/tasks/6';
-const postURL = 'https://todo-api-learning.herokuapp.com/v1/task/6';
 
+const instanceToDo = axios.create({
+    baseURL: "https://todo-api-learning.herokuapp.com"
+})
+ 
 
 
 export const ToDoList = () => {
 
     const [toDoList, setToDoList] = useState([]);
-    const [sortParam, setSortParam] = useState({ done: "", date: "ascending" });
+    const [sortParam, setSortParam] = useState({ done: "", date: "descending" });
     const [pageCount, setPageCount] = useState(1);
     const [activePage, setActivePage] = useState(1);
     const [itemPerPage, setItemPerPage] = useState(5);
@@ -28,10 +30,9 @@ export const ToDoList = () => {
 
     const getToDoList =  useCallback( async () => {
       
-
         const filterOptions = { 'true': 'done', 'false': 'undone' };
 
-        const { data } = await axios.get(getURL, { 
+        const { data } = await instanceToDo.get('/v1/tasks/6', { 
           params : { 
             filterBy: filterOptions[sortParam.done] ?? '', 
             order : sortParam.date === 'ascending' ? 'asc' : 'desc'   
@@ -80,25 +81,25 @@ console.log('useEf');
 
   const createNewToDo = async (e) => {
     if(e.key === "Enter" && e.target.value.trim()) {
-      await axios.post(postURL, {name: e.target.value.trim(), done: false});
+      await instanceToDo.post('/v1/task/6', {name: e.target.value.trim(), done: false});
       getToDoList();
     };
   };
 
   const changeDoneStatus = async (e) => {
-    await axios.patch(`${postURL}/${e.target.value}`, {done: e.target.checked});
+    await instanceToDo.patch(`/v1/task/6/${e.target.value}`, {done: e.target.checked});
     getToDoList();
     };
 
   const changeTask = async (e) => {
     if (e.key === "Enter" && e.target.value.trim()) {
-      await axios.patch(`${postURL}/${e.target.name}`, {name : e.target.value});
+      await instanceToDo.patch(`/v1/task/6/${e.target.name}`, {name : e.target.value});
       getToDoList();
     }; 
   };
 
   const deleteToDoItem = async (e) => {
-    await axios.delete(`${postURL}/${e.currentTarget.value}`);
+    await instanceToDo.delete(`/v1/task/6/${e.currentTarget.value}`);
     getToDoList();
   };
   
