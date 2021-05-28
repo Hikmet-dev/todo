@@ -40,10 +40,7 @@ export const ToDoList = () => {
         });
         
         const paginator =  (data, activePage, itemPerPage) => {
-          const paginCount =  data.length % itemPerPage
-          ? (Math.floor(data.length / itemPerPage) + 1) 
-          : (data.length / itemPerPage);
-          
+          const paginCount =  Math.ceil(data.length / itemPerPage);  
           const activePagin =  activePage <= paginCount ? activePage : paginCount;
           const sliceStart =  (activePagin - 1) * itemPerPage;
           const sliceEnd =  activePagin * itemPerPage;
@@ -74,8 +71,6 @@ export const ToDoList = () => {
     
     getToDoList();
     
-console.log('useEf');
-
   }, [getToDoList]);
 
 
