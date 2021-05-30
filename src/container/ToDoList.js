@@ -11,7 +11,7 @@ import { FilterPanel } from './FilterPanel';
 import axios from 'axios';
 
 const instanceToDo = axios.create({
-    baseURL: "https://todo-api-learning.herokuapp.com"
+    baseURL: process.env.REACT_APP_API_LINK
 })
  
 
@@ -30,6 +30,7 @@ export const ToDoList = () => {
 
     const getToDoList =  useCallback( async () => {
       
+
         const filterOptions = { 'true': 'done', 'false': 'undone' };
 
         const { data } = await instanceToDo.get('/v1/tasks/6', { 
