@@ -4,7 +4,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 export const ToDoListItem = ({task, onCheck, onDelete, onChange}) => {
   const [chanher, setChanher] = useState(false);
-
   const showInput = (e) => {
     setChanher(!chanher)
   }; 

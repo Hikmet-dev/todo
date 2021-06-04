@@ -1,9 +1,7 @@
 import React from 'react';
 import { ButtonGroup, Button } from '@material-ui/core';
 
-
 export default function DoneSort({onChange, doneSort}) {
-
     return (
     <ButtonGroup color="primary" aria-label="outlined primary button group">
     <Button onClick={onChange} variant={ doneSort === "" && "contained"} value="">All</Button>

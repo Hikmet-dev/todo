@@ -1,8 +1,6 @@
 import React from 'react';
 import { Select, MenuItem } from "@material-ui/core";
 
-
-
 export const ItemPerPageFilter = ({onChangeItemFilter, itemPerPage}) => {
     return(
         <Select
