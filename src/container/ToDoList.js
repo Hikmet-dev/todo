@@ -1,5 +1,5 @@
 import React, {  useState, useEffect, useCallback} from  'react';
-import { Container, Grid, Typography, List, CircularProgress} from '@material-ui/core';
+import { Container, Grid, List, CircularProgress} from '@material-ui/core';
 import { CreateToDo }  from '../components/CreateToDo';
 import { Pagination } from '../components/Pagination';
 import { ToDoListItem } from '../components/ToDoListItem';
@@ -98,7 +98,6 @@ export const ToDoList = () => {
 
   return(
       <Container maxWidth="md">
-      <Typography variant="h1" component="h2" align="center">To do list</Typography>
           <Grid item pt={50}>
           <CreateToDo onKeyPress={createNewToDo} />
           </Grid>

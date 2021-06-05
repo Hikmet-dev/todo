@@ -1,16 +1,7 @@
 import React from 'react';
 import { useFormik  } from 'formik';
-import { Input, Grid, Button, FormHelperText  } from '@material-ui/core';
-
-const validate = values => {
-    const errors = {};
-    if (!values.email) errors.email = 'Required';
-    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) errors.email = 'Invalid email address';
-    if(!values.password) errors.password = 'Required';
-    if (values.password.length < 7) errors.password = 'Must be 8 characters or more';
-    return errors;
-};
-
+import * as Yup from 'yup';
+import { Input, Button, FormHelperText  } from '@material-ui/core';
 
 export const LogIn = () => {
         const formik = useFormik({
@@ -18,36 +9,31 @@ export const LogIn = () => {
             email: '',
             password: ''
           },
-          validate,
+          validationSchema: Yup.object({
+              email: Yup.string().email('Invalid email address').required('Required'),
+              password: Yup.string().min(8, 'Must be 8 characters or more').required('Required')
+          }) ,
           onSubmit: values => {
             alert(JSON.stringify(values, null, 2));
           },
         });
     return(
-    <Grid container spacing={6} justify="center">
-        <Grid item xs={6} >     
         <form onSubmit={formik.handleSubmit}>
             <Input 
                 placeholder="Email" 
                 id="email" 
-                name="email"
+                {...formik.getFieldProps('email')}
                 fullWidth
-                error={(formik.touched.email && formik.errors.email)}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur} 
-                value={formik.values.email} 
+                error={(formik.touched.email && formik.errors.email)  && true}
                 />
                 {(formik.touched.email && formik.errors.email) 
                     && <FormHelperText id="component-error-text">{formik.errors.email}</FormHelperText>}
             <Input 
                 placeholder="Password" 
                 id="password" 
-                name="password"
+                {...formik.getFieldProps('password')}
                 fullWidth
-                error={(formik.touched.password && formik.errors.password)} 
-                onChange={formik.handleChange} 
-                onBlur={formik.handleBlur} 
-                value={formik.values.password} 
+                error={(formik.touched.password && formik.errors.password)  && true} 
             />
                 {(formik.touched.password && formik.errors.password) 
                     && <FormHelperText id="component-error-text">{formik.errors.password}</FormHelperText>}
@@ -55,9 +41,8 @@ export const LogIn = () => {
                 variant="contained" 
                 color="secondary" 
                 type="submit"
+                fullWidth
                 >Log in</Button>
         </form>
-      </Grid>
-    </Grid>
     )
 };

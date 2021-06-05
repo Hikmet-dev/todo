@@ -1,9 +1,10 @@
 import React, {  useState } from 'react';
-import { Container, Snackbar} from '@material-ui/core';
+import { Container, Snackbar, Typography} from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { ToDoList } from './container/ToDoList';
 import axios from 'axios';
-import { LogIn } from './components/LogIn';
+import { Auth } from './container/Auth';
+
 
 function App() {
   const [error, setError] = useState(null);
@@ -23,8 +24,9 @@ function App() {
     };
   return (
     <Container>
+      <Typography variant="h1" component="h2" align="center">To do list</Typography>
       {auth && <ToDoList />}
-      {!auth && <LogIn />}
+      {!auth && <Auth />}
       {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
                               <AlertTitle>{error.name}</AlertTitle>
