@@ -1,7 +1,7 @@
 import React from 'react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import { Button} from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import { InputAuth } from './InputAuth';
 
 export const SignUp = () => {
@@ -26,15 +26,18 @@ export const SignUp = () => {
                 }, 400);
               }}>
             <Form>
-              <InputAuth name="firstName" placeholder="First name" />
-              <InputAuth name="lastName" placeholder="Last name" />
-              <InputAuth name="email" placeholder="Email" />
-              <InputAuth name="password" placeholder="Password"  type="password"/>
-            <Button 
+              <InputAuth name="firstName" label="First name" />
+              <InputAuth name="lastName" label="Last name" />
+              <InputAuth name="email" label="Email" />
+              <InputAuth name="password" label="Password"  type="password" autoComplete="current-password" />
+              <Grid item >
+              <Button 
                 variant="contained" 
-                color="secondary" 
+                color="primary"
                 type="submit"
                 fullWidth >Sign up</Button>
+              </Grid>
+
             </Form>
         </Formik>
     );

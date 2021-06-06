@@ -8,6 +8,5 @@ export default function DoneSort({onChange, doneSort}) {
     <Button onClick={onChange} variant={ doneSort === "true" && "contained"} value="true">Done</Button>
     <Button onClick={onChange} variant={ doneSort === "false" && "contained"} value="false" >Undone</Button>
     </ButtonGroup>
-
     )
 }

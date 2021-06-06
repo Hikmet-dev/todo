@@ -11,10 +11,10 @@ const handleLog = (e) => {
     setLogIn(!logIn)
 }
     return(
-        <Grid container spacing={6} justify="center"   alignItems="center" >
-        <Grid item xs={6} >  
+        <Grid container justify="center"   alignItems="center" >
+        <Grid item>  
         {logIn ? <LogIn /> : <SignUp />}
-        <Button variant="contained" color="primary" onClick={handleLog} fullWidth>{logIn ? 'Sign up' : 'Log in'}</Button>
+        <Button color="primary" onClick={handleLog} fullWidth>{logIn ? 'Sign up' : 'Log in'}</Button>
         </Grid>
     </Grid>
     )

@@ -15,14 +15,14 @@ export const ToDoListItem = ({task, onCheck, onDelete, onChange}) => {
           color="primary"  
           onChange={onCheck} 
           checked={task.done} 
-          value={task.uuid} 
+          value={task.id} 
         />
       </ListItemIcon>
       {chanher 
         ? (<Input 
             defaultValue={task.name}
             autoFocus={true}
-            name={`${task.uuid}`}
+            name={`${task.id}`}
             onBlur={e => showInput(e)} 
             onKeyDown={e => e.key === "Escape" && setChanher(false)} 
             onKeyPress={onChange}
@@ -36,7 +36,7 @@ export const ToDoListItem = ({task, onCheck, onDelete, onChange}) => {
         
         <ListItemText  primary={task.createdAt} />
         <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="delete" onClick={onDelete} value={task.uuid}>
+                    <IconButton edge="end" aria-label="delete" onClick={onDelete} value={task.id}>
                       <DeleteIcon />
                     </IconButton>
         </ListItemSecondaryAction>

@@ -6,78 +6,80 @@ import { ToDoListItem } from '../components/ToDoListItem';
 import { FilterPanel } from './FilterPanel';
 import axios from 'axios';
 const instanceToDo = axios.create({
-    baseURL: process.env.REACT_APP_API_LINK
+    baseURL: "https://data-multi-user.herokuapp.com/",
+    headers: {
+      'Authorization': sessionStorage.getItem('token')
+    }
 })
  
 export const ToDoList = () => {
   const [toDoList, setToDoList] = useState([]);
-  const [sortParam, setSortParam] = useState({ done: "", date: "descending" });
+  const [sortParam, setSortParam] = useState({ done: "", date: "desc" });
   const [pageCount, setPageCount] = useState(1);
   const [activePage, setActivePage] = useState(1);
   const [itemPerPage, setItemPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(false)
 
   const getToDoList =  useCallback( async () => {
-    
+    try{
+      const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
+        params: {
+          filterBy: sortParam.done,
+          order: sortParam.date,
+          page: activePage,
+          taskCount: itemPerPage
+        }
+      });
+      setPageCount(pageCount);
+      setToDoList(tasks)
+      await setIsLoading(true);
+    } catch(error) {
+      console.log(error.message);
+    }
 
-    const filterOptions = { 'true': 'done', 'false': 'undone' };
 
-    const { data } = await instanceToDo.get('/v1/tasks/6', { 
-      params : { 
-        filterBy: filterOptions[sortParam.done] ?? '', 
-        order : sortParam.date === 'ascending' ? 'asc' : 'desc'   
-      }
-    });
-    
-    const paginator =  (data, activePage, itemPerPage) => {
-      const paginCount =  Math.ceil(data.length / itemPerPage);  
-      const activePagin =  activePage <= paginCount ? activePage : paginCount;
-      const sliceStart =  (activePagin - 1) * itemPerPage;
-      const sliceEnd =  activePagin * itemPerPage;
-      
-      return {
-        paginCount: paginCount,
-        activePagin : activePagin,
-        sliceStart : sliceStart,
-        sliceEnd : sliceEnd
-      }
-    };
-    
-    const {paginCount, activePagin, sliceStart, sliceEnd} = paginator(data, activePage, itemPerPage);
-      
-    setActivePage(activePagin);
-    setPageCount(paginCount);
-    
-    const todolister = await data.slice(sliceStart, sliceEnd);
-    setToDoList(todolister)
-    
-    await setIsLoading(true);
-}, [activePage, itemPerPage, sortParam]);
+}, [sortParam, activePage, itemPerPage]);
   
   useEffect(() => {getToDoList()}, [getToDoList]);
 
   const createNewToDo = async (e) => {
-    if(e.key === "Enter" && e.target.value.trim()) {
-      await instanceToDo.post('/v1/task/6', {name: e.target.value.trim(), done: false});
-      getToDoList();
-    };
-  };
-
-  const changeDoneStatus = async (e) => {
-    await instanceToDo.patch(`/v1/task/6/${e.target.value}`, {done: e.target.checked});
-    getToDoList();
+    try{
+      if(e.key === "Enter" && e.target.value.trim()) {
+        await instanceToDo.post('/task', {name: e.target.value.trim(), done: false});
+        getToDoList();
+      };
+    } catch(error) {
+      console.log(error);
+    }
   };
 
   const changeTask = async (e) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
-      await instanceToDo.patch(`/v1/task/6/${e.target.name}`, {name : e.target.value});
+    try{
+      if (e.key === "Enter" && e.target.value.trim()) {
+        await instanceToDo.patch(`/task/${e.target.name}`, {name : e.target.value});
+        getToDoList();
+      }; 
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
+  const changeDoneStatus = async (e) => {
+    try{
+      await instanceToDo.patch(`/task/${e.target.value}`, {done: e.target.checked});
       getToDoList();
-    }; 
+    } catch(error) {
+      console.log(error);
+    }
   };
 
   const deleteToDoItem = async (e) => {
-    await instanceToDo.delete(`/v1/task/6/${e.currentTarget.value}`);
-    getToDoList();
+    try {
+      await instanceToDo.delete(`/task/${e.currentTarget.value}`);
+      getToDoList();
+    } catch(error) {
+      console.log(error);
+    }
   };
   
   const clickOnPage = (e) => {
@@ -93,7 +95,8 @@ export const ToDoList = () => {
   };
 
   const doneSort = (e) => {
-    setSortParam(param => ({...param, done: e.currentTarget.value}) );
+    setSortParam(param => ({...param, done: e.currentTarget.value}));
+    setActivePage(1);
   };
 
   return(
@@ -112,7 +115,7 @@ export const ToDoList = () => {
           </Grid>
           <List>
       {isLoading
-              ?  (toDoList.map(task => <ToDoListItem key={task.uuid} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)) 
+              ?  (toDoList.map(task => <ToDoListItem key={task.id} task={task} onCheck={changeDoneStatus} onDelete={deleteToDoItem} onChange={changeTask} />)) 
               :   <CircularProgress />}
           </List>
       </Container>
