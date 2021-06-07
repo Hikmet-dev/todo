@@ -3,20 +3,10 @@ import { Formik, Form  } from 'formik';
 import * as Yup from 'yup';
 import { Button, Grid  } from '@material-ui/core';
 import { InputAuth } from './InputAuth';
-import axios from 'axios';
-
-const instanceLogin = axios.create({
-    baseURL: "https://data-multi-user.herokuapp.com/"
-})
 
 
+export const LogIn = ({logInSubmit}) => {
 
-export const LogIn = () => {
-    const loginSubmit = async (value) => {
-        const loginetr = await instanceLogin.post('login', {...value})
-        console.log(loginetr);
-        sessionStorage.setItem("token", loginetr.data.token);
-    };
     return(
         <Formik 
             initialValues={{
@@ -28,7 +18,7 @@ export const LogIn = () => {
                 password: Yup.string().min(8, 'Must be 8 characters or more').required('Required')
             })}
             onSubmit={(values, { setSubmitting }) => {
-                loginSubmit(values)
+                logInSubmit(values)
                 setSubmitting(false);
             }}>
             <Form>

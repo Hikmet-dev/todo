@@ -4,7 +4,8 @@ import * as Yup from 'yup';
 import { Button, Grid } from '@material-ui/core';
 import { InputAuth } from './InputAuth';
 
-export const SignUp = () => {
+
+export const SignUp = ({signUpSubmit}) => {
     return(
         <Formik
             initialValues={{
@@ -20,10 +21,8 @@ export const SignUp = () => {
                 password: Yup.string().min(8, 'Must be 8 characters or more').required('Required')})
             }
             onSubmit={(values, { setSubmitting }) => {
-                setTimeout(() => {
-                  alert(JSON.stringify(values, null, 2));
-                  setSubmitting(false);
-                }, 400);
+              signUpSubmit(values);
+              setSubmitting(false);
               }}>
             <Form>
               <InputAuth name="firstName" label="First name" />
@@ -35,7 +34,8 @@ export const SignUp = () => {
                 variant="contained" 
                 color="primary"
                 type="submit"
-                fullWidth >Sign up</Button>
+                fullWidth 
+                >Sign up</Button>
               </Grid>
 
             </Form>

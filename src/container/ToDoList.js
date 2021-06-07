@@ -6,13 +6,13 @@ import { ToDoListItem } from '../components/ToDoListItem';
 import { FilterPanel } from './FilterPanel';
 import axios from 'axios';
 const instanceToDo = axios.create({
-    baseURL: "https://data-multi-user.herokuapp.com/",
+    baseURL: process.env.REACT_APP_LINK,
     headers: {
       'Authorization': sessionStorage.getItem('token')
     }
 })
  
-export const ToDoList = () => {
+export const ToDoList = ({token}) => {
   const [toDoList, setToDoList] = useState([]);
   const [sortParam, setSortParam] = useState({ done: "", date: "desc" });
   const [pageCount, setPageCount] = useState(1);
@@ -20,32 +20,45 @@ export const ToDoList = () => {
   const [itemPerPage, setItemPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(false)
 
-  const getToDoList =  useCallback( async () => {
+  const getToDoList =  useCallback( async (token) => {
     try{
-      const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
-        params: {
-          filterBy: sortParam.done,
-          order: sortParam.date,
-          page: activePage,
-          taskCount: itemPerPage
-        }
-      });
-      setPageCount(pageCount);
-      setToDoList(tasks)
+      if(sessionStorage.token) {
+        const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
+          params: {
+            filterBy: sortParam.done,
+            order: sortParam.date,
+            page: activePage,
+            taskCount: itemPerPage
+          },
+          headers: {
+            'Authorization': token ?? sessionStorage.getItem('token')
+          }
+
+        });
+        setPageCount(pageCount);
+        setToDoList(tasks)
+      }
+      if(!sessionStorage.token) {
+        setPageCount(1);
+        setToDoList([])
+      }
+      
       await setIsLoading(true);
     } catch(error) {
-      console.log(error.message);
+      console.log(error.stack);
     }
 
 
 }, [sortParam, activePage, itemPerPage]);
   
-  useEffect(() => {getToDoList()}, [getToDoList]);
+  useEffect((token) => {getToDoList(token)}, [getToDoList]);
 
   const createNewToDo = async (e) => {
     try{
       if(e.key === "Enter" && e.target.value.trim()) {
-        await instanceToDo.post('/task', {name: e.target.value.trim(), done: false});
+        await instanceToDo.post('/task', {name: e.target.value.trim(), done: false}, {headers: {
+          'Authorization': token ?? sessionStorage.getItem('token')
+        }});
         getToDoList();
       };
     } catch(error) {
@@ -56,8 +69,10 @@ export const ToDoList = () => {
   const changeTask = async (e) => {
     try{
       if (e.key === "Enter" && e.target.value.trim()) {
-        await instanceToDo.patch(`/task/${e.target.name}`, {name : e.target.value});
-        getToDoList();
+        await instanceToDo.patch(`/task/${e.target.name}`, {name : e.target.value}, {headers: {
+          'Authorization': token ?? sessionStorage.getItem('token')
+        }});
+        getToDoList(token);
       }; 
     } catch(error) {
       console.log(error);
@@ -66,8 +81,10 @@ export const ToDoList = () => {
 
   const changeDoneStatus = async (e) => {
     try{
-      await instanceToDo.patch(`/task/${e.target.value}`, {done: e.target.checked});
-      getToDoList();
+      await instanceToDo.patch(`/task/${e.target.value}`, {done: e.target.checked}, {headers: {
+        'Authorization': token ?? sessionStorage.getItem('token')
+      }});
+      getToDoList(token);
     } catch(error) {
       console.log(error);
     }
@@ -75,8 +92,10 @@ export const ToDoList = () => {
 
   const deleteToDoItem = async (e) => {
     try {
-      await instanceToDo.delete(`/task/${e.currentTarget.value}`);
-      getToDoList();
+      await instanceToDo.delete(`/task/${e.currentTarget.value}`, {headers: {
+        'Authorization': token ?? sessionStorage.getItem('token')
+      }});
+      getToDoList(token);
     } catch(error) {
       console.log(error);
     }
