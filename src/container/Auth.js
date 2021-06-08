@@ -9,11 +9,11 @@ export const instanceAuth = axios.create({
 })
 
 
-export const Auth = ({logIn, getUser}) => {
+export const Auth = ({logIn, getDataUser}) => {
 const logInSubmit = async (values) => {
     try{
-        const loginReq = await instanceAuth.post('login', {...values});
-        getUser(loginReq.data)
+        const loginReq = await instanceAuth.post('login', values);
+        getDataUser(loginReq.data)
     } catch (error) {
         console.log(error);
     }
@@ -21,10 +21,10 @@ const logInSubmit = async (values) => {
 
 const signUpSubmit = async (values) => {
     try {
-      await instanceAuth.post('signup', {...values});
-      setTimeout(logInSubmit({email: values.email, password: values.password}), 3000); 
+      await instanceAuth.post('signup', values);
+      logInSubmit({email: values.email, password: values.password}); 
     } catch(error) {
-      console.log(error);
+      console.log(error.response.data);
     }
   };
 

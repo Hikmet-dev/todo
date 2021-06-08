@@ -6,10 +6,7 @@ import { ToDoListItem } from '../components/ToDoListItem';
 import { FilterPanel } from './FilterPanel';
 import axios from 'axios';
 const instanceToDo = axios.create({
-    baseURL: process.env.REACT_APP_LINK,
-    headers: {
-      'Authorization': sessionStorage.getItem('token')
-    }
+    baseURL: process.env.REACT_APP_LINK
 })
  
 export const ToDoList = ({token}) => {
@@ -22,7 +19,9 @@ export const ToDoList = ({token}) => {
 
   const getToDoList =  useCallback( async (token) => {
     try{
+
       if(sessionStorage.token) {
+
         const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
           params: {
             filterBy: sortParam.done,
@@ -45,7 +44,7 @@ export const ToDoList = ({token}) => {
       
       await setIsLoading(true);
     } catch(error) {
-      console.log(error.stack);
+      console.log(error.response.data);
     }
 
 
@@ -62,7 +61,7 @@ export const ToDoList = ({token}) => {
         getToDoList();
       };
     } catch(error) {
-      console.log(error);
+      console.log(error.response.data);
     }
   };
 
@@ -75,7 +74,7 @@ export const ToDoList = ({token}) => {
         getToDoList(token);
       }; 
     } catch(error) {
-      console.log(error);
+      console.log(error.response.data);
     }
   };
 
@@ -86,7 +85,7 @@ export const ToDoList = ({token}) => {
       }});
       getToDoList(token);
     } catch(error) {
-      console.log(error);
+      console.log(error.response.data);
     }
   };
 
@@ -97,7 +96,7 @@ export const ToDoList = ({token}) => {
       }});
       getToDoList(token);
     } catch(error) {
-      console.log(error);
+      console.log(error.response.data);
     }
   };
   

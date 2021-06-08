@@ -5,7 +5,7 @@ import { ToDoList } from './container/ToDoList';
 import axios from 'axios';
 import { Auth } from './container/Auth';
 import { NavBar } from './components/NavBar';
-
+import * as jwt from 'jsonwebtoken';
 
 function App() {
   const [error, setError] = useState(null);
@@ -24,21 +24,30 @@ function App() {
   });
 
   useEffect(() => {
-    if(user) {
+
+    if(sessionStorage.getItem('token')) {
+      const exp = jwt.decode(sessionStorage.getItem('token').split(' ')[1])?.exp
+      axios.defaults.headers = {'Authorization': sessionStorage.getItem('token')}
+      Date.now() > exp ? setAuth(true) : setAuth(false);
+    }
+
+    if(user){
       setAuth(true);
       sessionStorage.setItem('token', user.token)
-    }
-    if(!user) {
-      setAuth(false);
+      sessionStorage.setItem('firstName', user.firstName);
+      sessionStorage.setItem('lastName', user.lastName)
     }
   }, [user]);
 
 
   const logout = () => {
-    setUser(undefined)
+    setUser(undefined);
+    setAuth(false);
+    sessionStorage.clear();
+
   };
-  const getUser = (values) => {
-    setUser({...values})
+  const getDataUser = (authData) => {
+    setUser(authData)
   };
   const handleLog = (e) => {
     setLogIn(!logIn)
@@ -52,7 +61,7 @@ function App() {
     <Container>
       <NavBar handleLog={handleLog} logIn={logIn} user={user} logout={logout} />
       {auth && <ToDoList token={user?.token} />}
-      {!auth && <Auth logIn={logIn} getUser={getUser} />}
+      {!auth && <Auth logIn={logIn} getDataUser={getDataUser} />}
       {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
                               <AlertTitle>{error.name}</AlertTitle>
