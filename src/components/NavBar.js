@@ -1,6 +1,8 @@
 import React from 'react';
 import { AppBar, Toolbar, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector, useDispatch } from 'react-redux';
+import {toggleLoginForm, selectLoginForm } from '../features/auth/authSlice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,7 +16,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const NavBar = ({handleLog, logIn, user, logout}) => {
+export const NavBar = ({ logout}) => {
+  const LoginForm = useSelector(selectLoginForm);
+  const dispatch = useDispatch();
+
   const classes = useStyles();
 
   return(
@@ -32,7 +37,7 @@ export const NavBar = ({handleLog, logIn, user, logout}) => {
           </Typography>
           <Button color="inherit" onClick={logout}>Log Out</Button></div>
         )}
-        {!sessionStorage.getItem('firstName') && <Button color="inherit" onClick={handleLog}>{logIn ? 'Sign up' : 'Login'}</Button>}
+        {!sessionStorage.getItem('firstName') && <Button color="inherit" onClick={() =>dispatch(toggleLoginForm())}>{LoginForm ? 'Sign up' : 'Login'}</Button>}
       </Toolbar>
     </AppBar>
     </div>

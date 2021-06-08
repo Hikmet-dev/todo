@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { selectLoginForm } from '../features/auth/authSlice';
 import { LogIn } from '../components/LogIn';
 import { SignUp } from '../components/SignUp';
 import { Grid } from '@material-ui/core';
@@ -9,8 +11,10 @@ export const instanceAuth = axios.create({
 })
 
 
-export const Auth = ({logIn, getDataUser}) => {
-const logInSubmit = async (values) => {
+export const Auth = ({ getDataUser}) => {
+  const loginForm = useSelector(selectLoginForm)
+
+  const logInSubmit = async (values) => {
     try{
         const loginReq = await instanceAuth.post('login', values);
         getDataUser(loginReq.data)
@@ -31,7 +35,7 @@ const signUpSubmit = async (values) => {
     return(
         <Grid container spacing={10} justify="center"   alignItems="center" >
         <Grid item xs={5} >  
-        {logIn ? <LogIn logInSubmit={logInSubmit}  /> : <SignUp signUpSubmit={signUpSubmit} />}
+        {loginForm ? <LogIn logInSubmit={logInSubmit}  /> : <SignUp signUpSubmit={signUpSubmit} />}
         </Grid>
     </Grid>
     )

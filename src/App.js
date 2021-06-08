@@ -10,7 +10,6 @@ import * as jwt from 'jsonwebtoken';
 function App() {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
-  const [logIn, setLogIn] = useState(true);
   const [user, setUser] = useState();
   const [auth, setAuth] = useState(false);
 
@@ -49,9 +48,7 @@ function App() {
   const getDataUser = (authData) => {
     setUser(authData)
   };
-  const handleLog = (e) => {
-    setLogIn(!logIn)
-};
+
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') return;
     setOpen(false);
@@ -59,9 +56,9 @@ function App() {
 
   return (
     <Container>
-      <NavBar handleLog={handleLog} logIn={logIn} user={user} logout={logout} />
+      <NavBar logout={logout} />
       {auth && <ToDoList token={user?.token} />}
-      {!auth && <Auth logIn={logIn} getDataUser={getDataUser} />}
+      {!auth && <Auth getDataUser={getDataUser} />}
       {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
                               <AlertTitle>{error.name}</AlertTitle>
