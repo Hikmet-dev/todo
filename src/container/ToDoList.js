@@ -5,17 +5,22 @@ import { Pagination } from '../components/Pagination';
 import { ToDoListItem } from '../components/ToDoListItem';
 import { FilterPanel } from './FilterPanel';
 import axios from 'axios';
+import {selectOrder, selectFilterBy} from '../features/filter/filterSlice';
+import { useSelector } from 'react-redux';
 const instanceToDo = axios.create({
     baseURL: process.env.REACT_APP_LINK
 })
- 
+
+
 export const ToDoList = ({token}) => {
   const [toDoList, setToDoList] = useState([]);
-  const [sortParam, setSortParam] = useState({ done: "", date: "desc" });
   const [pageCount, setPageCount] = useState(1);
   const [activePage, setActivePage] = useState(1);
   const [itemPerPage, setItemPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const order = useSelector(selectOrder);
+  const filterBy = useSelector(selectFilterBy);
+
 
   const getToDoList =  useCallback( async (token) => {
     try{
@@ -24,8 +29,8 @@ export const ToDoList = ({token}) => {
 
         const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
           params: {
-            filterBy: sortParam.done,
-            order: sortParam.date,
+            filterBy: filterBy,
+            order: order,
             page: activePage,
             taskCount: itemPerPage
           },
@@ -48,7 +53,7 @@ export const ToDoList = ({token}) => {
     }
 
 
-}, [sortParam, activePage, itemPerPage]);
+}, [order, filterBy, activePage, itemPerPage]);
   
   useEffect((token) => {getToDoList(token)}, [getToDoList]);
 
@@ -108,24 +113,13 @@ export const ToDoList = ({token}) => {
       setItemPerPage(e.target.value)
   };
 
-  const taskSort = (e) => {
-    setSortParam(param => ({...param, date: e.currentTarget.value}) );
-  };
-
-  const doneSort = (e) => {
-    setSortParam(param => ({...param, done: e.currentTarget.value}));
-    setActivePage(1);
-  };
 
   return(
       <Container maxWidth="md">
           <Grid item pt={50}>
           <CreateToDo onKeyPress={createNewToDo} />
           </Grid>
-          <FilterPanel 
-              onChange={taskSort} 
-              sortParam={sortParam} 
-              doneSort={doneSort} 
+          <FilterPanel  
               onChangeItemFilter={changeItemPerPageFilter}
               itemPerPage={itemPerPage} />
           <Grid item alignItems="center" container xs={12}>
