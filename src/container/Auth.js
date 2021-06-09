@@ -1,26 +1,27 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { selectLoginForm } from '../features/auth/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectLoginForm, toggleAuthStatus } from '../features/auth/authSlice';
 import { LogIn } from '../components/LogIn';
 import { SignUp } from '../components/SignUp';
 import { Grid } from '@material-ui/core';
 import axios from 'axios';
+import {fetchUser} from '../features/user/userSlice';
+
 
 export const instanceAuth = axios.create({
     baseURL: process.env.REACT_APP_LINK
 })
 
 
-export const Auth = ({ getDataUser}) => {
-  const loginForm = useSelector(selectLoginForm)
+export const Auth = () => {
+  const loginForm = useSelector(selectLoginForm);
+  const dispatch = useDispatch()
 
-  const logInSubmit = async (values) => {
-    try{
-        const loginReq = await instanceAuth.post('login', values);
-        getDataUser(loginReq.data)
-    } catch (error) {
-        console.log(error);
-    }
+  const logInSubmit = (values) => {
+        // const loginReq = await instanceAuth.post('login', values);
+        // getDataUser(loginReq.data)
+        dispatch(fetchUser(values));
+        // dispatch(toggleAuthStatus(true))
 };
 
 const signUpSubmit = async (values) => {
@@ -31,7 +32,6 @@ const signUpSubmit = async (values) => {
       console.log(error.response.data);
     }
   };
-
     return(
         <Grid container spacing={10} justify="center"   alignItems="center" >
         <Grid item xs={5} >  

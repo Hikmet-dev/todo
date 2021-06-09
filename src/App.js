@@ -6,12 +6,15 @@ import axios from 'axios';
 import { Auth } from './container/Auth';
 import { NavBar } from './components/NavBar';
 import * as jwt from 'jsonwebtoken';
+import {useSelector, useDispatch} from 'react-redux';
+import {selectAuthStatus, toggleAuthStatus} from './features/auth/authSlice';
 
 function App() {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState();
-  const [auth, setAuth] = useState(false);
+  const authStatus = useSelector(selectAuthStatus);
+  const dispatch = useDispatch();
+
 
   axios.interceptors.response.use(undefined, (error) =>  {
     if( [422, 404, 400].includes(error.response?.status) ) {
@@ -22,32 +25,20 @@ function App() {
     return Promise.reject(error);
   });
 
+
+
   useEffect(() => {
 
     if(sessionStorage.getItem('token')) {
       const exp = jwt.decode(sessionStorage.getItem('token').split(' ')[1])?.exp
       axios.defaults.headers = {'Authorization': sessionStorage.getItem('token')}
-      Date.now() > exp ? setAuth(true) : setAuth(false);
+      if(Date.now() > exp) dispatch(toggleAuthStatus(true))
+
     }
-
-    if(user){
-      setAuth(true);
-      sessionStorage.setItem('token', user.token)
-      sessionStorage.setItem('firstName', user.firstName);
-      sessionStorage.setItem('lastName', user.lastName)
-    }
-  }, [user]);
+  }, [dispatch]);
 
 
-  const logout = () => {
-    setUser(undefined);
-    setAuth(false);
-    sessionStorage.clear();
 
-  };
-  const getDataUser = (authData) => {
-    setUser(authData)
-  };
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') return;
@@ -56,9 +47,9 @@ function App() {
 
   return (
     <Container>
-      <NavBar logout={logout} />
-      {auth && <ToDoList token={user?.token} />}
-      {!auth && <Auth getDataUser={getDataUser} />}
+      <NavBar />
+      {authStatus && <ToDoList />}
+      {!authStatus && <Auth />}
       {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
                               <AlertTitle>{error.name}</AlertTitle>

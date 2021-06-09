@@ -6,23 +6,24 @@ import { ToDoListItem } from '../components/ToDoListItem';
 import { FilterPanel } from './FilterPanel';
 import axios from 'axios';
 import {selectOrder, selectFilterBy} from '../features/filter/filterSlice';
+import {selectToken } from '../features/user/userSlice';
 import { useSelector } from 'react-redux';
 const instanceToDo = axios.create({
     baseURL: process.env.REACT_APP_LINK
 })
 
 
-export const ToDoList = ({token}) => {
+export const ToDoList = () => {
   const [toDoList, setToDoList] = useState([]);
   const [pageCount, setPageCount] = useState(1);
   const [activePage, setActivePage] = useState(1);
   const [itemPerPage, setItemPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
   const order = useSelector(selectOrder);
+  const token = useSelector(selectToken)
   const filterBy = useSelector(selectFilterBy);
 
-
-  const getToDoList =  useCallback( async (token) => {
+  const getToDoList =  useCallback( async () => {
     try{
 
       if(sessionStorage.token) {
@@ -35,7 +36,7 @@ export const ToDoList = ({token}) => {
             taskCount: itemPerPage
           },
           headers: {
-            'Authorization': token ?? sessionStorage.getItem('token')
+            'Authorization': token 
           }
 
         });
@@ -53,7 +54,7 @@ export const ToDoList = ({token}) => {
     }
 
 
-}, [order, filterBy, activePage, itemPerPage]);
+}, [order, filterBy, token, activePage, itemPerPage]);
   
   useEffect((token) => {getToDoList(token)}, [getToDoList]);
 
@@ -61,7 +62,7 @@ export const ToDoList = ({token}) => {
     try{
       if(e.key === "Enter" && e.target.value.trim()) {
         await instanceToDo.post('/task', {name: e.target.value.trim(), done: false}, {headers: {
-          'Authorization': token ?? sessionStorage.getItem('token')
+          'Authorization': token 
         }});
         getToDoList();
       };
@@ -74,7 +75,7 @@ export const ToDoList = ({token}) => {
     try{
       if (e.key === "Enter" && e.target.value.trim()) {
         await instanceToDo.patch(`/task/${e.target.name}`, {name : e.target.value}, {headers: {
-          'Authorization': token ?? sessionStorage.getItem('token')
+          'Authorization': token 
         }});
         getToDoList(token);
       }; 
@@ -86,7 +87,7 @@ export const ToDoList = ({token}) => {
   const changeDoneStatus = async (e) => {
     try{
       await instanceToDo.patch(`/task/${e.target.value}`, {done: e.target.checked}, {headers: {
-        'Authorization': token ?? sessionStorage.getItem('token')
+        'Authorization': token
       }});
       getToDoList(token);
     } catch(error) {

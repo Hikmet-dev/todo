@@ -2,7 +2,8 @@ import React from 'react';
 import { AppBar, Toolbar, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import {toggleLoginForm, selectLoginForm } from '../features/auth/authSlice';
+import {toggleLoginForm, selectLoginForm,  logOut} from '../features/auth/authSlice';
+import {selectLastName, selectFirstName} from '../features/user/userSlice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,8 +17,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const NavBar = ({ logout}) => {
+export const NavBar = () => {
   const LoginForm = useSelector(selectLoginForm);
+  const firstName = useSelector(selectFirstName);
+  const lastName = useSelector(selectLastName);
   const dispatch = useDispatch();
 
   const classes = useStyles();
@@ -31,13 +34,13 @@ export const NavBar = ({ logout}) => {
         To do list
         </Typography>
 
-        {sessionStorage.getItem('firstName') && (
+        {firstName && (
           <div><Typography variant="body2" >
-          {`${sessionStorage.getItem('firstName')} ${sessionStorage.getItem('lastName')}`}
+          {`${firstName} ${lastName}`}
           </Typography>
-          <Button color="inherit" onClick={logout}>Log Out</Button></div>
+          <Button color="inherit" onClick={() => dispatch(logOut(), )}>Log Out</Button></div>
         )}
-        {!sessionStorage.getItem('firstName') && <Button color="inherit" onClick={() =>dispatch(toggleLoginForm())}>{LoginForm ? 'Sign up' : 'Login'}</Button>}
+        {!sessionStorage.getItem('firstName') && <Button color="inherit" onClick={() => dispatch(toggleLoginForm())}>{LoginForm ? 'Sign up' : 'Login'}</Button>}
       </Toolbar>
     </AppBar>
     </div>
