@@ -1,14 +1,10 @@
 import {createAsyncThunk,  createSlice } from '@reduxjs/toolkit';
-import axios from 'axios'
-
-const userInstance = axios.create({
-    baseURL: process.env.REACT_APP_LINK
-})
+import {instanceHeroku} from '../../instanceAxios';
 
 export const fetchUser =  createAsyncThunk(
     'user/fetchToken',
     async (userData, thunkAPI) => { 
-        const res = await userInstance.post(`login`, userData);
+        const res = await instanceHeroku.post(`login`, userData);
         return res.data
     }
 );
@@ -16,7 +12,7 @@ export const fetchUser =  createAsyncThunk(
 export const userRegistration = createAsyncThunk(
     'user/registration',
     async (userData, thunkAPI) => {
-        const res = await userInstance.post(`signup`, userData);
+        const res = await instanceHeroku.post(`signup`, userData);
         return res.data 
     });
 

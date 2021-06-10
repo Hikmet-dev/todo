@@ -1,14 +1,15 @@
 import React, {  useLayoutEffect, useState } from 'react';
-import { Container, Snackbar} from '@material-ui/core';
+import {useSelector, useDispatch } from 'react-redux';
+import * as jwt from 'jsonwebtoken';
+import { instanceHeroku } from './instanceAxios'; 
+import { Container, Snackbar } from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { ToDoList } from './container/ToDoList';
-import axios from 'axios';
 import { Auth } from './container/Auth';
 import { NavBar } from './components/NavBar';
-import * as jwt from 'jsonwebtoken';
-import {useSelector, useDispatch} from 'react-redux';
-import {selectAuthStatus, toggleAuthStatus} from './features/auth/authSlice';
+import { selectAuthStatus, toggleAuthStatus } from './features/auth/authSlice';
 import { selectIsLoading } from './features/user/userSlice';
+
 
 function App() {
   const [error, setError] = useState(null);
@@ -17,11 +18,11 @@ function App() {
   const isLoading = useSelector(selectIsLoading);
   const dispatch = useDispatch();
   
-  axios.interceptors.response.use(undefined, (error) =>  {
+  instanceHeroku.interceptors.response.use(undefined, (error) =>  {
     if( [422, 404, 400].includes(error.response?.status) ) {
-      setError(error)
+      setError(error.response.data)
       setOpen(true);
-      console.log("erroer");
+      console.log(error.response.data);
     }
     return Promise.reject(error);
   });
@@ -29,7 +30,7 @@ function App() {
   useLayoutEffect(() => {
     if(sessionStorage.getItem('token')) {
       const exp = jwt.decode(sessionStorage.getItem('token').split(' ')[1])?.exp
-      axios.defaults.headers = {'Authorization': sessionStorage.getItem('token')}
+      instanceHeroku.defaults.headers = {'Authorization': sessionStorage.getItem('token')}
       if(Date.now() > exp) dispatch(toggleAuthStatus(true))
     }
   });
@@ -45,7 +46,7 @@ function App() {
       {!(authStatus && isLoading) && <Auth />}
       {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
-                              <AlertTitle>{error.name}</AlertTitle>
+                              <AlertTitle>{`Error ${error.statusCode}`}</AlertTitle>
                               {error.message} 
                               </Alert>
                             </Snackbar>)}       

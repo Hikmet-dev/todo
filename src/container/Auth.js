@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectLoginForm } from '../features/auth/authSlice';
+import { Grid } from '@material-ui/core';
 import { LogIn } from '../components/LogIn';
 import { SignUp } from '../components/SignUp';
-import { Grid } from '@material-ui/core';
+import { selectLoginForm } from '../features/auth/authSlice';
 
 export const Auth = () => {
   const loginForm = useSelector(selectLoginForm);

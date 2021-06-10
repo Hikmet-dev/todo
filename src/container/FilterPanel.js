@@ -1,8 +1,8 @@
 import React from "react";
 import { Grid, Typography } from "@material-ui/core";
+import { ItemPerPageFilter } from '../components/ItemPerPageFilter';
 import DoneSort from "../components/DoneSort";
 import DateSort from "../components/DateSort";
-import { ItemPerPageFilter } from '../components/ItemPerPageFilter';
 
 export const FilterPanel = ({onChangeItemFilter, itemPerPage}) => {
   return (

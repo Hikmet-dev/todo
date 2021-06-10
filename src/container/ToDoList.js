@@ -1,17 +1,13 @@
 import React, {  useState, useEffect, useCallback} from  'react';
+import { useSelector } from 'react-redux';
 import { Container, Grid, List, CircularProgress} from '@material-ui/core';
+import { instanceHeroku } from '../instanceAxios';
 import { CreateToDo }  from '../components/CreateToDo';
 import { Pagination } from '../components/Pagination';
 import { ToDoListItem } from '../components/ToDoListItem';
 import { FilterPanel } from './FilterPanel';
-import axios from 'axios';
 import {selectOrder, selectFilterBy} from '../features/filter/filterSlice';
 import {selectToken } from '../features/user/userSlice';
-
-import { useSelector } from 'react-redux';
-const instanceToDo = axios.create({
-    baseURL: process.env.REACT_APP_LINK
-})
 
 
 export const ToDoList = () => {
@@ -27,7 +23,7 @@ export const ToDoList = () => {
   const getToDoList =  useCallback( async () => {
     try{
       if(sessionStorage.token) {
-        const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
+        const  {data: {pageCount, tasks}}  = await instanceHeroku.get('/tasks', {
           params: {
             filterBy: filterBy,
             order: order,
@@ -59,7 +55,7 @@ export const ToDoList = () => {
   const createNewToDo = async (e) => {
     try{
       if(e.key === "Enter" && e.target.value.trim()) {
-        await instanceToDo.post('/task', {name: e.target.value.trim(), done: false}, {headers: {
+        await instanceHeroku.post('/task', {name: e.target.value.trim(), done: false}, {headers: {
           'Authorization': token 
         }});
         getToDoList();
@@ -72,10 +68,8 @@ export const ToDoList = () => {
   const changeTask = async (e) => {
     try{
       if (e.key === "Enter" && e.target.value.trim()) {
-        await instanceToDo.patch(`/task/${e.target.name}`, {name : e.target.value}, {headers: {
-          'Authorization': token 
-        }});
-        getToDoList(token);
+        await instanceHeroku.patch(`/task/${e.target.name}`, {name : e.target.value});
+        getToDoList();
       }; 
     } catch(error) {
       console.log(error.response.data);
@@ -84,10 +78,8 @@ export const ToDoList = () => {
 
   const changeDoneStatus = async (e) => {
     try{
-      await instanceToDo.patch(`/task/${e.target.value}`, {done: e.target.checked}, {headers: {
-        'Authorization': token
-      }});
-      getToDoList(token);
+      await instanceHeroku.patch(`/task/${e.target.value}`, {done: e.target.checked});
+      getToDoList();
     } catch(error) {
       console.log(error.response.data);
     }
@@ -95,10 +87,8 @@ export const ToDoList = () => {
 
   const deleteToDoItem = async (e) => {
     try {
-      await instanceToDo.delete(`/task/${e.currentTarget.value}`, {headers: {
-        'Authorization': token ?? sessionStorage.getItem('token')
-      }});
-      getToDoList(token);
+      await instanceHeroku.delete(`/task/${e.currentTarget.value}`);
+      getToDoList();
     } catch(error) {
       console.log(error.response.data);
     }
