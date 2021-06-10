@@ -21,7 +21,6 @@ export const ToDoList = () => {
   const filterBy = useSelector(selectFilterBy);
 
   const getToDoList =  useCallback( async () => {
-    try{
       if(sessionStorage.token) {
         const  {data: {pageCount, tasks}}  = await instanceHeroku.get('/tasks', {
           params: {
@@ -43,55 +42,37 @@ export const ToDoList = () => {
       }
       
       await setIsLoading(true);
-    } catch(error) {
-      console.log(error.response.data);
-    }
-
 
 }, [order, filterBy, token, activePage, itemPerPage]);
   
   useEffect((token) => {getToDoList(token)}, [getToDoList]);
 
   const createNewToDo = async (e) => {
-    try{
       if(e.key === "Enter" && e.target.value.trim()) {
         await instanceHeroku.post('/task', {name: e.target.value.trim(), done: false}, {headers: {
           'Authorization': token 
         }});
         getToDoList();
       };
-    } catch(error) {
-      console.log(error.response.data);
-    }
   };
 
   const changeTask = async (e) => {
-    try{
+
       if (e.key === "Enter" && e.target.value.trim()) {
         await instanceHeroku.patch(`/task/${e.target.name}`, {name : e.target.value});
         getToDoList();
       }; 
-    } catch(error) {
-      console.log(error.response.data);
-    }
   };
 
   const changeDoneStatus = async (e) => {
-    try{
       await instanceHeroku.patch(`/task/${e.target.value}`, {done: e.target.checked});
       getToDoList();
-    } catch(error) {
-      console.log(error.response.data);
-    }
   };
 
   const deleteToDoItem = async (e) => {
-    try {
       await instanceHeroku.delete(`/task/${e.currentTarget.value}`);
       getToDoList();
-    } catch(error) {
-      console.log(error.response.data);
-    }
+
   };
   
   const clickOnPage = (e) => {
