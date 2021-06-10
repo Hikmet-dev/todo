@@ -3,9 +3,15 @@ import { Formik, Form  } from 'formik';
 import * as Yup from 'yup';
 import { Button, Grid  } from '@material-ui/core';
 import { InputAuth } from './InputAuth';
+import {useDispatch } from 'react-redux'
+import { fetchUser } from '../features/user/userSlice';
+import { toggleAuthStatus } from '../features/auth/authSlice';
 
 
-export const LogIn = ({logInSubmit}) => {
+
+export const LogIn = () => {
+    const dispatch = useDispatch();
+
 
     return(
         <Formik 
@@ -18,7 +24,8 @@ export const LogIn = ({logInSubmit}) => {
                 password: Yup.string().min(8, 'Must be 8 characters or more').required('Required')
             })}
             onSubmit={(values, { setSubmitting }) => {
-                logInSubmit(values)
+                dispatch(fetchUser(values));
+                dispatch(toggleAuthStatus(true))
                 setSubmitting(false);
             }}>
             <Form>

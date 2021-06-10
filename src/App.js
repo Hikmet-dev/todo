@@ -1,4 +1,4 @@
-import React, {  useEffect, useState } from 'react';
+import React, {  useLayoutEffect, useState } from 'react';
 import { Container, Snackbar} from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { ToDoList } from './container/ToDoList';
@@ -8,11 +8,13 @@ import { NavBar } from './components/NavBar';
 import * as jwt from 'jsonwebtoken';
 import {useSelector, useDispatch} from 'react-redux';
 import {selectAuthStatus, toggleAuthStatus} from './features/auth/authSlice';
+import { selectIsLoading } from './features/user/userSlice';
 
 function App() {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const authStatus = useSelector(selectAuthStatus);
+  const isLoading = useSelector(selectIsLoading);
   const dispatch = useDispatch();
 
 
@@ -25,20 +27,14 @@ function App() {
     return Promise.reject(error);
   });
 
-
-
-  useEffect(() => {
+  useLayoutEffect(() => {
 
     if(sessionStorage.getItem('token')) {
       const exp = jwt.decode(sessionStorage.getItem('token').split(' ')[1])?.exp
       axios.defaults.headers = {'Authorization': sessionStorage.getItem('token')}
       if(Date.now() > exp) dispatch(toggleAuthStatus(true))
-
     }
-  }, [dispatch]);
-
-
-
+  });
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') return;
@@ -48,8 +44,8 @@ function App() {
   return (
     <Container>
       <NavBar />
-      {authStatus && <ToDoList />}
-      {!authStatus && <Auth />}
+      {(authStatus && isLoading) && <ToDoList />}
+      {!(authStatus && isLoading) && <Auth />}
       {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
                               <AlertTitle>{error.name}</AlertTitle>
