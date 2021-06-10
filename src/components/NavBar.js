@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import {toggleLoginForm, selectLoginForm,  logOut, selectAuthStatus} from '../features/auth/authSlice';
-import {selectLastName, selectFirstName, clearUserData} from '../features/user/userSlice';
+import {selectLastName, selectFirstName, clearUserData, selectIsLoading} from '../features/user/userSlice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,6 +22,7 @@ export const NavBar = () => {
   const firstName = useSelector(selectFirstName);
   const lastName = useSelector(selectLastName);
   const authStatus = useSelector(selectAuthStatus)
+  const isLoading = useSelector(selectIsLoading);
   const dispatch = useDispatch();
 
   const classes = useStyles();
@@ -35,13 +36,13 @@ export const NavBar = () => {
         To do list
         </Typography>
 
-        {authStatus && (
+        {(authStatus && isLoading) && (
           <div><Typography variant="body2" >
           {`${firstName} ${lastName}`}
           </Typography>
           <Button color="inherit" onClick={() => dispatch(logOut())}>Log Out</Button></div>
         )}
-        {!authStatus && <Button color="inherit" onClick={() => {dispatch(toggleLoginForm()); dispatch(clearUserData()) } }>{LoginForm ? 'Sign up' : 'Login'}</Button>}
+        {!(authStatus && isLoading) && <Button color="inherit" onClick={() => {dispatch(toggleLoginForm()); dispatch(clearUserData()) } }>{LoginForm ? 'Sign up' : 'Login'}</Button>}
       </Toolbar>
     </AppBar>
     </div>

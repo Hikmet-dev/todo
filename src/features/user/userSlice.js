@@ -22,7 +22,7 @@ const initialState = {
     token: sessionStorage.token || '',
     isLoading: true,
     hasError: false
-}
+};
 
 const userSlice  = createSlice({
     name: 'user',

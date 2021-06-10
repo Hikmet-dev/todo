@@ -9,20 +9,21 @@ import { Auth } from './container/Auth';
 import { NavBar } from './components/NavBar';
 import { selectAuthStatus, toggleAuthStatus } from './features/auth/authSlice';
 import { selectIsLoading } from './features/user/userSlice';
-
+import {createError, selectErrorStatus, selectErrorStatusCode, selectErrorMesage} from './features/error/errorSlice';
 
 function App() {
-  const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const authStatus = useSelector(selectAuthStatus);
   const isLoading = useSelector(selectIsLoading);
+  const errorStatus = useSelector(selectErrorStatus);
+  const errorStatusCode = useSelector(selectErrorStatusCode);
+  const errorMessage = useSelector(selectErrorMesage);
   const dispatch = useDispatch();
   
   instanceHeroku.interceptors.response.use(undefined, (error) =>  {
     if( [422, 404, 400].includes(error.response?.status) ) {
-      setError(error.response.data)
+      dispatch(createError(error.response.data));
       setOpen(true);
-      console.log(error.response.data);
     }
     return Promise.reject(error);
   });
@@ -44,10 +45,10 @@ function App() {
       <NavBar />
       {(authStatus && isLoading) && <ToDoList />}
       {!(authStatus && isLoading) && <Auth />}
-      {error && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
+      {errorStatus && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
                               <Alert severity="error" onClose={handleClose} > 
-                              <AlertTitle>{`Error ${error.statusCode}`}</AlertTitle>
-                              {error.message} 
+                              <AlertTitle>{`Error ${errorStatusCode}`}</AlertTitle>
+                              {errorMessage} 
                               </Alert>
                             </Snackbar>)}       
     </Container>
