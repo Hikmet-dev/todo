@@ -7,7 +7,6 @@ import {useDispatch } from 'react-redux';
 import { userRegistration } from '../features/user/userSlice';
 import { toggleAuthStatus } from '../features/auth/authSlice';
 
-
 export const SignUp = () => {
   const dispatch = useDispatch();
   return(
