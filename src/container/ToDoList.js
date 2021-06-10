@@ -26,9 +26,7 @@ export const ToDoList = () => {
 
   const getToDoList =  useCallback( async () => {
     try{
-
       if(sessionStorage.token) {
-
         const  {data: {pageCount, tasks}}  = await instanceToDo.get('/tasks', {
           params: {
             filterBy: filterBy,
@@ -39,7 +37,6 @@ export const ToDoList = () => {
           headers: {
             'Authorization': token 
           }
-
         });
         setPageCount(pageCount);
         setToDoList(tasks)

@@ -16,8 +16,7 @@ function App() {
   const authStatus = useSelector(selectAuthStatus);
   const isLoading = useSelector(selectIsLoading);
   const dispatch = useDispatch();
-
-
+  
   axios.interceptors.response.use(undefined, (error) =>  {
     if( [422, 404, 400].includes(error.response?.status) ) {
       setError(error)
@@ -28,7 +27,6 @@ function App() {
   });
 
   useLayoutEffect(() => {
-
     if(sessionStorage.getItem('token')) {
       const exp = jwt.decode(sessionStorage.getItem('token').split(' ')[1])?.exp
       axios.defaults.headers = {'Authorization': sessionStorage.getItem('token')}
@@ -40,7 +38,6 @@ function App() {
     if (reason === 'clickaway') return;
     setOpen(false);
   };
-
   return (
     <Container>
       <NavBar />

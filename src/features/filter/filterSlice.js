@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-
 const initialState = {
     filterByButtons: [
         {name: 'all', value: undefined},
@@ -27,13 +26,9 @@ export const  filterSlice = createSlice({
 
 export const {toggleOrder, toggleFilterBy} = filterSlice.actions;
 
-
 export const selectOrderValue = state => state.filter.orderValue;
 export const selectFilterBy = state => state.filter.filterBy;
 export const selectOrder = state => state.filter.order.toUpperCase();
 export const selectFilterByButtons = state => state.filter.filterByButtons;
-
-
-
 
 export default filterSlice.reducer;

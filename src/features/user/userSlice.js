@@ -5,8 +5,6 @@ const userInstance = axios.create({
     baseURL: process.env.REACT_APP_LINK
 })
 
-
-
 export const fetchUser =  createAsyncThunk(
     'user/fetchToken',
     async (userData, thunkAPI) => { 
@@ -18,7 +16,7 @@ export const fetchUser =  createAsyncThunk(
 export const userRegistration = createAsyncThunk(
     'user/registration',
     async (userData, thunkAPI) => {
-        const res = await userInstance.post('signup', userData);
+        const res = await userInstance.post(`signup`, userData);
         return res.data 
     });
 
@@ -53,14 +51,13 @@ const userSlice  = createSlice({
             sessionStorage.setItem('lastName', state.lastName);
             state.isLoading = true;
             state.hasError = false;
-
         },
         [fetchUser.rejected]: (state, action) => {
             state.isLoading = false;
             state.hasError = true;
         },
         [userRegistration.pending]: (state) => {
-            state.isLoading = true
+            state.isLoading = false
             state.hasError = false
         },
         [userRegistration.fulfilled]: (state, action) => {
@@ -79,7 +76,6 @@ const userSlice  = createSlice({
         }
     }
 });
-
 
 export const { clearUserData } = userSlice.actions;
 
