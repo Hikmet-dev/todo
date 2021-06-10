@@ -24,7 +24,7 @@ const initialState = {
     firstName: sessionStorage.firstName || '',
     lastName: sessionStorage.lastName || '',
     token: sessionStorage.token || '',
-    isLoading: false,
+    isLoading: true,
     hasError: false
 }
 
