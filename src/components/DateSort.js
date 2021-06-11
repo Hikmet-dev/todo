@@ -10,7 +10,15 @@ export default function DateSort() {
 
     return(<>
     <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
-      {orderValue.map(item => <Button key={item} size="medium" variant={ order === item && "contained"} onClick={e => dispatch(toggleOrder(e.currentTarget.value))} value={item}>{item}</Button>)}
+      {orderValue
+          .map(item => 
+          <Button 
+            key={item}
+            size="medium"
+            variant={ order === item && "contained"}
+            onClick={e => dispatch(toggleOrder(e.currentTarget.value))}
+            value={item}
+            >{item}</Button>)}
     </ButtonGroup>  
       </>
     );

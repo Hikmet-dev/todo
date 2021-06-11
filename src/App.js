@@ -9,7 +9,7 @@ import { Auth } from './container/Auth';
 import { NavBar } from './components/NavBar';
 import { selectAuthStatus, toggleAuthStatus } from './features/auth/authSlice';
 import { selectIsLoading } from './features/user/userSlice';
-import { createError, closeError, selectErrorStatus, selectErrorStatusCode, selectErrorMesage, } from './features/error/errorSlice';
+import { closeError, selectErrorStatus, selectErrorStatusCode, selectErrorMesage, } from './features/error/errorSlice';
 
 function App() {
   const authStatus = useSelector(selectAuthStatus);
@@ -18,11 +18,6 @@ function App() {
   const errorStatusCode = useSelector(selectErrorStatusCode);
   const errorMessage = useSelector(selectErrorMesage);
   const dispatch = useDispatch();
-  
-  instanceHeroku.interceptors.response.use(undefined, (error) =>  {
-    if([422, 404, 400].includes(error.response?.status)) dispatch(createError(error.response.data));
-    return Promise.reject(error);
-  });
 
   useLayoutEffect(() => {
     if(sessionStorage.getItem('token')) {

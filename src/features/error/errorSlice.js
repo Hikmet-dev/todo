@@ -16,6 +16,7 @@ const errorSlice = createSlice({
             state.statusCode = action.payload.statusCode;
             state.errorMesage = action.payload.message;
             state.errorStatus = true;
+            console.log('createError');
         },
         closeError: (state, action) => {
             if(action.payload === 'clickaway') return;

@@ -5,16 +5,25 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { store } from './features/store';
 import { Provider } from 'react-redux';
-import axios from 'axios';
+import {instanceHeroku} from './instanceAxios';
+import {createError } from './features/error/errorSlice';
+import {logOut} from './features/auth/authSlice';
 
 
-axios.interceptors.request.use(request => {
+instanceHeroku.interceptors.request.use(request => {
   return request;
 }, error =>{
   return Promise.reject(error);
 });
 
-
+instanceHeroku.interceptors.response.use(undefined, (error) =>  {
+  if([422, 404, 400].includes(error.response?.status)){
+    store.dispatch(createError(error.response.data));
+    if(error.response.data.message === 'Invalid token') store.dispatch(logOut());
+    console.log(`interceptors:`, error.response.data);
+  } 
+  return Promise.reject(error);
+});
 
 
 
@@ -24,8 +33,4 @@ ReactDOM.render(
 </Provider>,
   document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

@@ -33,6 +33,9 @@ export const ToDoList = () => {
             'Authorization': token 
           }
         });
+        if(pageCount < activePage) {
+          setActivePage(1)
+        }
         setPageCount(pageCount);
         setToDoList(tasks)
       }
