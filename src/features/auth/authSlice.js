@@ -28,5 +28,3 @@ export const selectLoginForm = state => state.auth.loginForm;
 export const selectAuthStatus = state => state.auth.authStatus;
 
 export default authSlice.reducer;
-
-

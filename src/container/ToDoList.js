@@ -43,7 +43,7 @@ export const ToDoList = () => {
       
       await setIsLoading(true);
 
-}, [order, filterBy, token, activePage, itemPerPage]);
+  }, [order, filterBy, token, activePage, itemPerPage]);
   
   useEffect((token) => {getToDoList(token)}, [getToDoList]);
 
@@ -72,7 +72,6 @@ export const ToDoList = () => {
   const deleteToDoItem = async (e) => {
       await instanceHeroku.delete(`/task/${e.currentTarget.value}`);
       getToDoList();
-
   };
   
   const clickOnPage = (e) => {
@@ -82,7 +81,6 @@ export const ToDoList = () => {
   const changeItemPerPageFilter = (e) => {
       setItemPerPage(e.target.value)
   };
-
 
   return(
       <Container maxWidth="md">

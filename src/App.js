@@ -1,4 +1,4 @@
-import React, {  useLayoutEffect, useState } from 'react';
+import React, {  useLayoutEffect } from 'react';
 import {useSelector, useDispatch } from 'react-redux';
 import * as jwt from 'jsonwebtoken';
 import { instanceHeroku } from './instanceAxios'; 
@@ -9,10 +9,9 @@ import { Auth } from './container/Auth';
 import { NavBar } from './components/NavBar';
 import { selectAuthStatus, toggleAuthStatus } from './features/auth/authSlice';
 import { selectIsLoading } from './features/user/userSlice';
-import {createError, selectErrorStatus, selectErrorStatusCode, selectErrorMesage} from './features/error/errorSlice';
+import { createError, closeError, selectErrorStatus, selectErrorStatusCode, selectErrorMesage, } from './features/error/errorSlice';
 
 function App() {
-  const [open, setOpen] = useState(false);
   const authStatus = useSelector(selectAuthStatus);
   const isLoading = useSelector(selectIsLoading);
   const errorStatus = useSelector(selectErrorStatus);
@@ -21,10 +20,7 @@ function App() {
   const dispatch = useDispatch();
   
   instanceHeroku.interceptors.response.use(undefined, (error) =>  {
-    if( [422, 404, 400].includes(error.response?.status) ) {
-      dispatch(createError(error.response.data));
-      setOpen(true);
-    }
+    if([422, 404, 400].includes(error.response?.status)) dispatch(createError(error.response.data));
     return Promise.reject(error);
   });
 
@@ -36,21 +32,22 @@ function App() {
     }
   });
 
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') return;
-    setOpen(false);
-  };
   return (
     <Container>
       <NavBar />
       {(authStatus && isLoading) && <ToDoList />}
       {!(authStatus && isLoading) && <Auth />}
-      {errorStatus && (<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} >
-                              <Alert severity="error" onClose={handleClose} > 
-                              <AlertTitle>{`Error ${errorStatusCode}`}</AlertTitle>
-                              {errorMessage} 
-                              </Alert>
-                            </Snackbar>)}       
+      <Snackbar
+        open={errorStatus}
+        autoHideDuration={6000} 
+        onClose={(event, reason)=> dispatch(closeError(reason))}>
+          <Alert
+            severity="error" 
+            onClose={(event, reason)=> dispatch(closeError(reason))}> 
+            <AlertTitle>{`Error ${errorStatusCode}`}</AlertTitle>
+            {errorMessage} 
+          </Alert>
+        </Snackbar>     
     </Container>
   );
 };

@@ -16,23 +16,21 @@ const errorSlice = createSlice({
             state.statusCode = action.payload.statusCode;
             state.errorMesage = action.payload.message;
             state.errorStatus = true;
-
+        },
+        closeError: (state, action) => {
+            if(action.payload === 'clickaway') return;
+            state.errorStatus = false;
+            state.statusCode = state.errorMesage = '';
+            state.errorStack = {};
         }
     }
 });
 
-
-
-
-export const {createError} = errorSlice.actions;
-
+export const { createError, closeError } = errorSlice.actions;
 
 export const selectErrorStatus = state => state.error.errorStatus;
 export const selectErrorStatusCode = state => state.error.statusCode;
 export const selectErrorMesage = state => state.error.errorMesage;
 export const selectErrorStack = state => state.error.errorStack;
-
-
-
 
 export default errorSlice.reducer;
